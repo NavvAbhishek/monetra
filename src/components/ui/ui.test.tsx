@@ -114,7 +114,7 @@ describe('tone', () => {
   it('maps category indexes and named tones to token classes', () => {
     expect(toneBg(0)).toContain('bg-cat-0-soft')
     expect(toneBg(7)).toContain('bg-cat-1-soft') // wraps
-    expect(toneBg('primary')).toBe('bg-primary-soft text-primary')
+    expect(toneBg('primary')).toBe('bg-primary-soft text-primary-hover') // AA contrast (Phase 10)
     expect(toneText(4)).toBe('text-cat-4-strong')
     expect(toneText('neutral')).toBe('text-muted-foreground')
     expect(toneFill(2)).toBe('bg-cat-2-strong')

@@ -36,7 +36,12 @@ export const segmentedItemVariants = cva(
         sm: 'text-sm',
         md: '',
       },
+      /** Items share the row equally (mobile period tabs). */
+      fullWidth: {
+        true: 'min-w-0 flex-1 px-1',
+        false: '',
+      },
     },
-    defaultVariants: { variant: 'pill', size: 'md' },
+    defaultVariants: { variant: 'pill', size: 'md', fullWidth: false },
   },
 )

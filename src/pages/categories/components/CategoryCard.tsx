@@ -33,8 +33,8 @@ const CategoryCard = ({ category, stats, currency, compact, selected }: Category
           <span className="text-emoji-lg" aria-hidden>
             {category.emoji}
           </span>
-          <span className="flex flex-col">
-            <span className="text-md font-bold text-ink">{category.name}</span>
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate text-md font-bold text-ink">{category.name}</span>
             <span className="text-xs text-text-soft">
               <Amount cents={stats.cents} currency={currency} className="text-xs font-normal text-text-soft" /> ·{' '}
               {pluralise(stats.count, 'entry', 'entries')}
@@ -49,8 +49,8 @@ const CategoryCard = ({ category, stats, currency, compact, selected }: Category
             </span>
             <span className="text-xs font-semibold text-text-soft">{pluralise(stats.count, 'entry', 'entries')}</span>
           </span>
-          <span className="flex flex-col">
-            <span className="text-lg font-bold text-ink">{category.name}</span>
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate text-lg font-bold text-ink">{category.name}</span>
             <Amount cents={stats.cents} currency={currency} size="lg" />
           </span>
         </>

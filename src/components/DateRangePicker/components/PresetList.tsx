@@ -23,7 +23,7 @@ const PresetList = ({ ctx, variant }: { ctx: DateRangePickerCtx; variant: 'list'
           className={cn(
             'shrink-0 cursor-pointer whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring',
             variant === 'list'
-              ? cn('rounded-chip px-3 py-2.5 text-left text-base', active ? 'bg-primary-soft font-bold text-primary' : 'text-ink hover:bg-muted')
+              ? cn('rounded-chip px-3 py-2.5 text-left text-base', active ? 'bg-primary-soft font-bold text-primary-hover' : 'text-ink hover:bg-muted')
               : cn('h-9 rounded-control px-3 text-sm font-semibold', active ? 'bg-ink text-primary-foreground' : 'bg-card text-ink'),
           )}
         >

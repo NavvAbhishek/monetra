@@ -13,7 +13,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: 'bg-primary text-primary-foreground hover:bg-primary-hover',
-        secondary: 'bg-primary-soft text-primary hover:bg-bar',
+        secondary: 'bg-primary-soft text-primary-hover hover:bg-bar', // primary-hover: AA contrast on primary-soft
         surface: 'bg-card text-ink hover:bg-muted',
         muted: 'bg-bg text-ink hover:bg-muted', // grey button on a white surface (popover Cancel)
         outline: 'border-2 border-line bg-card text-ink hover:bg-muted',

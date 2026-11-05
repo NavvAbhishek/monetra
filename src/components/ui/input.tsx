@@ -25,7 +25,7 @@ export const Input = ({
 }: InputProps) => (
   <div data-slot="input" className={cn(fieldVariants({ variant, size }), wrapperClassName)}>
     {startIcon && (
-      <span className="flex shrink-0 text-muted-2 [&_svg]:size-4.5" aria-hidden>
+      <span className="flex shrink-0 text-muted-foreground [&_svg]:size-4.5" aria-hidden>
         {startIcon}
       </span>
     )}

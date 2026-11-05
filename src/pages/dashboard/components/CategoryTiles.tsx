@@ -1,4 +1,6 @@
 import { Amount } from '@/components/ui/amount'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Button } from '@/components/ui/button'
 import { Tile } from '@/components/ui/tile'
 import { toneText } from '@/components/ui/tone'
 import { cn } from '@/lib/utils'
@@ -17,7 +19,17 @@ const CategoryTiles = ({ ctx }: { ctx: DashboardCtx }) => (
       </Link>
     </div>
     {ctx.categoryTotals.length === 0 ? (
-      <p className="rounded-tile bg-card px-4 py-5 text-center text-sm text-muted-foreground">No spending in this period yet.</p>
+      <EmptyState
+        emoji="🧾"
+        title="No spending yet"
+        description="Add an expense and your categories will show up here."
+        className="py-7"
+        action={
+          <Button asChild size="sm">
+            <Link to="/expenses/new">+ Add expense</Link>
+          </Button>
+        }
+      />
     ) : (
       <ul className="grid grid-cols-2 gap-2.5">
         {ctx.categoryTotals.slice(0, 4).map(({ category, cents, percent }) => (
@@ -29,7 +41,7 @@ const CategoryTiles = ({ ctx }: { ctx: DashboardCtx }) => (
                 </span>
                 <span className={cn('text-xs font-semibold', toneText(category.colourIndex))}>{percent}%</span>
               </div>
-              <span className="pt-1 text-sm text-text-soft">{category.name}</span>
+              <span className="truncate pt-1 text-sm text-text-soft">{category.name}</span>
               <Amount cents={cents} currency={ctx.currency} size="md" />
             </Tile>
           </li>

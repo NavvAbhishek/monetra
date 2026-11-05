@@ -12,7 +12,7 @@ export type SeparatorProps = {
 export const Separator = ({ orientation = 'horizontal', label, className }: SeparatorProps) => {
   if (label) {
     return (
-      <div className={cn('flex items-center gap-2.5 text-xs text-muted-2', className)}>
+      <div className={cn('flex items-center gap-2.5 text-xs text-muted-foreground', className)}>
         <SeparatorPrimitive.Root decorative className="h-px flex-1 bg-line" />
         <span>{label}</span>
         <SeparatorPrimitive.Root decorative className="h-px flex-1 bg-line" />

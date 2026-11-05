@@ -43,7 +43,7 @@ const AreaLineChart = ({ values, labels, elapsedCount, ariaLabel, className }: A
           />
         )}
       </div>
-      <div className="mt-1.5 flex justify-between text-2xs text-primary-tint lg:mt-2.5 lg:text-xs" aria-hidden>
+      <div className="mt-1.5 flex justify-between text-2xs text-primary-foreground lg:mt-2.5 lg:text-xs" aria-hidden>
         {labels.map((label, i) => (
           <span key={`${label}-${i}`}>{label}</span>
         ))}

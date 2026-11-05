@@ -26,8 +26,8 @@
   --track: #e9e4f8; /* segmented control track */
   --bar: #d9d1f7; /* chart bars */
   --bar-empty: #eeeaf9; /* chart bars with no value */
-  --success: #2e8a50;
-  --danger: #d6453a;
+  --success: #297b47; /* design #2E8A50, darkened 11% for WCAG AA text contrast */
+  --danger: #c53f35; /* design #D6453A, darkened 8% for WCAG AA (on white and danger-soft) */
   --danger-foreground: #ffffff;
   --danger-soft: #fff0ee;
   --overlay: rgb(29 22 56 / 0.42); /* modal backdrop */
@@ -48,19 +48,21 @@
   --theme-pink: #be185d;
   --theme-graphite: #334155;
 
-  /* ---------- Category colours (colourIndex 0–5) ---------- */
+  /* ---------- Category colours (colourIndex 0–5) ----------
+     The -strong colours are the design's, darkened just enough for WCAG AA (4.5:1) as small text on
+     their -soft colour (design values in the comments). */
   --cat-0-soft: #ffe1d6;
-  --cat-0-strong: #d4562a;
+  --cat-0-strong: #b04723; /* #D4562A */
   --cat-1-soft: #dff5e1;
-  --cat-1-strong: #2e8a50;
+  --cat-1-strong: #297b47; /* #2E8A50 */
   --cat-2-soft: #e3e9ff;
-  --cat-2-strong: #4c6cf0;
+  --cat-2-strong: #435fd3; /* #4C6CF0 */
   --cat-3-soft: #fff1c9;
-  --cat-3-strong: #a87a0e;
+  --cat-3-strong: #8d660c; /* #A87A0E */
   --cat-4-soft: #f5dfff;
-  --cat-4-strong: #9640cf;
+  --cat-4-strong: #903dc7; /* #9640CF */
   --cat-5-soft: #d9f3f5;
-  --cat-5-strong: #1a8794;
+  --cat-5-strong: #177782; /* #1A8794 */
 
   /* ---------- shadcn/ui semantic variables → brand ---------- */
   --radius: 0.75rem;
@@ -235,6 +237,23 @@
   --shadow-side: -10px 0 30px rgba(29, 22, 56, 0.06);
   --shadow-tabbar: 0 -6px 20px rgba(29, 22, 56, 0.06);
   --shadow-pop: 0 24px 60px rgba(29, 22, 56, 0.25);
+}
+
+/* Bottom padding that clears the iPhone home indicator (needs viewport-fit=cover, set in index.html). */
+@utility pb-safe {
+  padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+}
+
+/* Respect "reduce motion": no slide / zoom / fade animations, instant transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer base {

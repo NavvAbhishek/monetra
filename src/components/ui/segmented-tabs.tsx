@@ -45,7 +45,7 @@ export const SegmentedTabs = <T extends string>({
         key={option.value}
         value={option.value}
         disabled={option.disabled}
-        className={segmentedItemVariants({ variant, size })}
+        className={segmentedItemVariants({ variant, size, fullWidth })}
       >
         {option.label}
       </ToggleGroup.Item>

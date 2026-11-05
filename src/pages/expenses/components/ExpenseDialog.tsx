@@ -19,7 +19,17 @@ const ExpenseDialog = ({ ctx }: { ctx: ExpensesCtx }) => {
 
   return (
     <Dialog open onOpenChange={(open) => !open && closeEditor()}>
-      <DialogContent size="md">
+      <DialogContent
+        size="md"
+        onOpenAutoFocus={(e) => {
+          // start typing the amount right away (Radix would focus the close button)
+          const amount = document.getElementById('expense-amount')
+          if (amount) {
+            e.preventDefault()
+            amount.focus()
+          }
+        }}
+      >
         <DialogHeader title={isEdit ? 'Edit expense' : 'Add expense'} />
 
         {editorNotFound ? (

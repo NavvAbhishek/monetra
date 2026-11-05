@@ -9,7 +9,7 @@ export type Tone = number | 'neutral' | 'card' | 'primary' | 'success' | 'danger
 const NAMED_BG: Record<Exclude<Tone, number>, string> = {
   neutral: 'bg-bg text-ink',
   card: 'bg-card text-ink',
-  primary: 'bg-primary-soft text-primary',
+  primary: 'bg-primary-soft text-primary-hover', // AA contrast on the soft background
   success: 'bg-cat-1-soft text-success',
   danger: 'bg-danger-soft text-danger',
   ink: 'bg-ink text-primary-foreground',

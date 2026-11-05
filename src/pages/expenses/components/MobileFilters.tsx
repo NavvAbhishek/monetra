@@ -46,7 +46,7 @@ const MobileFilters = ({ ctx, searchOpen }: { ctx: ExpensesCtx; searchOpen: bool
       ))}
     </div>
 
-    <div className="flex items-center justify-between gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-2">
       <PeriodStepper ctx={ctx} />
       <PeriodTabs ctx={ctx} />
     </div>

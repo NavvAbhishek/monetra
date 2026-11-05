@@ -18,7 +18,7 @@ const Tab = ({ to, label, icon: TabIcon }: TabProps) => (
     activeOptions={{ exact: to === '/' }}
     className="grid size-11 place-items-center rounded-icon outline-none focus-visible:ring-2 focus-visible:ring-ring"
     activeProps={{ className: 'text-primary' }}
-    inactiveProps={{ className: 'text-muted-2' }}
+    inactiveProps={{ className: 'text-muted-foreground' }} // muted-2 is below 3:1 for icons
   >
     <TabIcon className="size-6" aria-hidden />
   </Link>
@@ -31,7 +31,7 @@ const MobileTabBar = ({ className }: { className?: string }) => {
     <nav
       aria-label="Tab bar"
       className={cn(
-        'fixed inset-x-0 bottom-0 z-40 grid h-20 grid-cols-5 items-center justify-items-center rounded-t-bar bg-card pb-2.5 shadow-tabbar',
+        'fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 items-center justify-items-center min-h-20 rounded-t-bar bg-card pt-2 pb-safe shadow-tabbar',
         className,
       )}
     >

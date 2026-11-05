@@ -43,7 +43,7 @@ const ExpensesTable = ({ ctx }: { ctx: ExpensesCtx }) => {
                 <td className="px-3">
                   <span className="flex items-center gap-2.5 font-semibold text-ink">
                     <EmojiBox emoji={category?.emoji ?? '🧾'} tone={tone} size="sm" />
-                    <span className="truncate">{expense.note || <span className="font-normal text-muted-2">No note</span>}</span>
+                    <span className="truncate">{expense.note || <span className="font-normal text-muted-foreground">No note</span>}</span>
                   </span>
                 </td>
                 <td className="px-3">

@@ -1,4 +1,5 @@
 import { Amount } from '@/components/ui/amount'
+import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmojiBox } from '@/components/ui/emoji-box'
 import { Progress } from '@/components/ui/progress'
@@ -15,7 +16,12 @@ const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: 
       </Link>
     </CardHeader>
     {ctx.categoryTotals.length === 0 ? (
-      <p className="m-auto text-sm text-muted-foreground">No spending in this period yet.</p>
+      <div className="m-auto flex flex-col items-center gap-3 text-center">
+        <p className="text-sm text-muted-foreground">No spending in this period yet.</p>
+        <Button asChild size="sm">
+          <Link to="/expenses/new">+ Add expense</Link>
+        </Button>
+      </div>
     ) : (
       <ul className="-mr-2 flex flex-col overflow-y-auto pr-2">
         {ctx.categoryTotals.map(({ category, cents, percent }) => (

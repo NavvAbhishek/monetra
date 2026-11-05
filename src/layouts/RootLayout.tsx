@@ -16,12 +16,17 @@ const RootLayout = () => {
   const matches = useMatches()
   const routeId = matches.at(-1)?.routeId
 
+  const title = getDocumentTitle(routeId)
   useEffect(() => {
-    document.title = getDocumentTitle(routeId)
-  }, [routeId])
+    document.title = title
+  }, [title])
 
   return (
     <>
+      {/* Single-page apps don't announce navigation — tell screen readers which page opened. */}
+      <p aria-live="polite" aria-atomic="true" className="sr-only">
+        {title}
+      </p>
       <Suspense fallback={<PageLoader />}>
         <Outlet />
       </Suspense>

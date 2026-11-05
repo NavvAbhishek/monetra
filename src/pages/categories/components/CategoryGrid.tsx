@@ -9,7 +9,15 @@ const CategoryGrid = ({ ctx }: { ctx: CategoriesCtx }) => {
   const selectedId = mode.kind === 'edit' ? mode.id : undefined
 
   return (
-    <ul className={isMobile ? 'grid grid-cols-2 gap-2.5' : 'grid grid-cols-3 gap-3.5'}>
+    <ul
+      className={
+        isMobile
+          ? 'grid grid-cols-2 gap-2.5'
+          : mode.kind === 'list'
+            ? 'grid grid-cols-3 gap-3.5'
+            : 'grid grid-cols-2 gap-3.5 xl:grid-cols-3' // side panel open: room for 3 only on wide screens
+      }
+    >
       {categories.map((category) => (
         <li key={category.id} className="contents">
           <CategoryCard
