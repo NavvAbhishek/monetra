@@ -121,3 +121,21 @@ describe('tone', () => {
     expect(toneFill('primary')).toBe('bg-primary')
   })
 })
+
+describe('SegmentedTabs fullWidth', () => {
+  it('shares the row equally so 5 tabs fit a small phone', () => {
+    render(
+      <SegmentedTabs
+        aria-label="Period"
+        fullWidth
+        value="a"
+        onValueChange={() => {}}
+        options={[
+          { value: 'a', label: 'A' },
+          { value: 'b', label: 'B' },
+        ]}
+      />,
+    )
+    expect(screen.getByRole('radio', { name: 'A' })).toHaveClass('flex-1')
+  })
+})

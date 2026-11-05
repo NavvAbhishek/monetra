@@ -10,7 +10,7 @@ const PresetList = ({ ctx, variant }: { ctx: DateRangePickerCtx; variant: 'list'
   <div
     role="group"
     aria-label="Quick ranges"
-    className={variant === 'list' ? 'flex flex-col gap-0.5' : '-mx-6 flex gap-2 overflow-x-auto px-6 pb-0.5'}
+    className={variant === 'list' ? 'flex flex-col gap-0.5' : 'scrollbar-none -mx-6 flex gap-2 overflow-x-auto px-6 pb-0.5'}
   >
     {PRESETS.map((p) => {
       const active = ctx.preset === p.key

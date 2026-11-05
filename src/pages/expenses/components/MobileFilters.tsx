@@ -23,7 +23,7 @@ const MobileFilters = ({ ctx, searchOpen }: { ctx: ExpensesCtx; searchOpen: bool
       />
     )}
 
-    <div role="group" aria-label="Filter by category" className="-mx-5.5 flex gap-2 overflow-x-auto px-5.5 pb-0.5">
+    <div role="group" aria-label="Filter by category" className="scrollbar-none -mx-5.5 flex gap-2 overflow-x-auto px-5.5 pb-0.5">
       <button
         type="button"
         aria-pressed={ctx.categoryId === 'all'}

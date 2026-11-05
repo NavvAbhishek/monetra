@@ -14,12 +14,12 @@ const ExpensesToolbar = ({ ctx }: { ctx: ExpensesCtx }) => (
       aria-label="Search notes"
       placeholder="Search notes"
       startIcon={<Icon.Search />}
-      wrapperClassName="w-80"
+      wrapperClassName="w-64 2xl:w-80"
       value={ctx.query}
       onChange={(e) => ctx.setQuery(e.target.value)}
     />
     <Select value={ctx.categoryId} onValueChange={ctx.setCategoryId}>
-      <SelectTrigger variant="filled" size="md" className="w-52" aria-label="Category">
+      <SelectTrigger variant="filled" size="md" className="w-48 2xl:w-52" aria-label="Category">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

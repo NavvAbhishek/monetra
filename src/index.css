@@ -244,6 +244,14 @@
   padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
 }
 
+/* Horizontally scrolling chip rows: still scrollable, no visible scrollbar. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Respect "reduce motion": no slide / zoom / fade animations, instant transitions. */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -1,4 +1,4 @@
-import { Controller } from 'react-hook-form'
+import { Controller, useWatch } from 'react-hook-form'
 import { AmountInput } from '@/components/ExpenseForm/components/AmountInput'
 import CategoryPicker from '@/components/ExpenseForm/components/CategoryPicker'
 import type { ExpenseFormCtx } from '@/components/ExpenseForm/hooks/useExpenseForm'
@@ -28,6 +28,7 @@ const ExpenseForm = ({ ctx, categories, currency, layout }: ExpenseFormProps) =>
   const { errors } = formState
   const isScreen = layout === 'screen'
   const amountError = errors.amount?.message
+  const amountText = useWatch({ control, name: 'amount' }) ?? ''
 
   const amountBlock = (
       <div className="flex flex-col gap-1 rounded-table bg-card px-5 py-4">
@@ -40,6 +41,7 @@ const ExpenseForm = ({ ctx, categories, currency, layout }: ExpenseFormProps) =>
             symbol={getCurrencySymbol(currency)}
             size={isScreen ? 'screen' : 'dialog'}
             invalid={!!amountError}
+            text={amountText}
             aria-describedby={amountError ? fieldMessageId('expense-amount') : undefined}
             {...register('amount')}
           />
@@ -54,8 +56,8 @@ const ExpenseForm = ({ ctx, categories, currency, layout }: ExpenseFormProps) =>
           <div className="mt-2 flex flex-col gap-3 border-t border-line pt-3">
             <FormField id="expense-date" label="When" labelVariant="muted" error={errors.date?.message}>
               <div className="flex gap-2">
-                <Input id="expense-date" type="date" size="md" {...fieldErrorProps('expense-date', errors.date?.message)} {...register('date')} />
-                <Input id="expense-time" type="time" size="md" aria-label="Time (optional)" wrapperClassName="w-32 shrink-0" {...register('time')} />
+                <Input id="expense-date" type="date" size="md" wrapperClassName="min-w-0 flex-1" {...fieldErrorProps('expense-date', errors.date?.message)} {...register('date')} />
+                <Input id="expense-time" type="time" size="md" aria-label="Time (optional)" wrapperClassName="w-28 shrink-0" {...register('time')} />
               </div>
             </FormField>
             <FormField id="expense-note" label="Note" labelVariant="muted" error={errors.note?.message}>

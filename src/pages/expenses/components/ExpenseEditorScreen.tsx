@@ -17,7 +17,7 @@ const ExpenseEditorScreen = ({ ctx }: { ctx: ExpensesCtx }) => {
   const { deleteNow, isDeleting } = useDeleteExpenseNow(closeEditor)
 
   return (
-    <div className="flex min-h-svh flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between">
         <IconButton asChild variant="surface" size="lg" aria-label="Back to expenses">
           <Link to="/expenses">
@@ -42,7 +42,7 @@ const ExpenseEditorScreen = ({ ctx }: { ctx: ExpensesCtx }) => {
           'Edit expense'
         ) : (
           <>
-            What did you
+            What did you{' '}
             <br />
             spend on?
           </>
@@ -51,7 +51,8 @@ const ExpenseEditorScreen = ({ ctx }: { ctx: ExpensesCtx }) => {
 
       <ExpenseForm ctx={formCtx} categories={categories} currency={currency} layout="screen" />
 
-      <div className="mt-auto pt-4">
+      {/* sticky: the save button is always reachable, above the iPhone home bar */}
+      <div className="sticky bottom-0 -mx-5.5 mt-2 bg-bg/95 px-5.5 pt-3 pb-safe backdrop-blur">
         <Button type="submit" form={EXPENSE_FORM_ID} size="xl" fullWidth loading={formCtx.isSaving}>
           {editedExpense ? 'Save changes' : 'Add expense'}
         </Button>

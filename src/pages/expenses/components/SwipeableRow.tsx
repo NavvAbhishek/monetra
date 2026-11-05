@@ -56,7 +56,8 @@ const SwipeableRow = ({ expenseId, onDelete, children }: SwipeableRowProps) => {
   return (
     <div className="relative overflow-hidden">
       {/* revealed actions */}
-      <div className="absolute inset-y-0 right-0 flex" aria-hidden={!isOpen}>
+      {/* hidden unless open / dragging — otherwise their colour bleeds through the row's anti-aliased edge */}
+      <div className={cn('absolute inset-y-0 right-0 flex', !isOpen && !dragging && 'invisible')} aria-hidden={!isOpen}>
         <Link
           to="/expenses/$expenseId"
           params={{ expenseId }}

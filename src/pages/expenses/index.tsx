@@ -81,7 +81,13 @@ const Expenses = () => {
     <div className="flex flex-col gap-4.5">
       <PageHeader
         title="Expenses"
-        description={isMobile ? `${ctx.periodHeading} · ${total}` : `${ctx.periodHeading} · ${entries} · ${total}`}
+        description={
+          isLoading // don't claim "$0.00" before the data has arrived
+            ? ctx.periodHeading
+            : isMobile
+              ? `${ctx.periodHeading} · ${total}`
+              : `${ctx.periodHeading} · ${entries} · ${total}`
+        }
         actions={
           isMobile ? (
             <IconButton

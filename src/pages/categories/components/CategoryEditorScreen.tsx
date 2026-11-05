@@ -18,7 +18,7 @@ const CategoryEditorScreen = ({ ctx }: { ctx: CategoriesCtx }) => {
   const formCtx = useCategoryForm({ category: selected, categoryCount: categories.length, onSaved: closeEditor })
 
   return (
-    <div className="flex min-h-svh flex-col gap-3.5">
+    <div className="flex flex-col gap-3.5">
       <header className="flex items-center justify-between">
         <IconButton asChild variant="surface" size="lg" aria-label="Back to categories">
           <Link to="/categories">
@@ -37,7 +37,8 @@ const CategoryEditorScreen = ({ ctx }: { ctx: CategoriesCtx }) => {
 
       <CategoryForm ctx={formCtx} layout="screen" />
 
-      <div className="mt-auto pt-4">
+      {/* sticky: the save button is always reachable, above the iPhone home bar */}
+      <div className="sticky bottom-0 -mx-5.5 mt-2 bg-bg/95 px-5.5 pt-3 pb-safe backdrop-blur">
         <Button type="submit" form={CATEGORY_FORM_ID} size="xl" fullWidth loading={formCtx.isSaving}>
           Save category
         </Button>
