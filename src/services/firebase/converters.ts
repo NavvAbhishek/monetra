@@ -1,6 +1,7 @@
 import { type DocumentData, type DocumentSnapshot, Timestamp } from 'firebase/firestore'
 import type { Category } from '@/types/category'
 import type { Expense } from '@/types/expense'
+import type { PastPeriodType, PastRecord } from '@/types/pastRecord'
 import type { Profile } from '@/types/profile'
 
 /** Firestore ↔ app types. `Timestamp` never leaves `services/firebase/` (CLAUDE.md §9). */
@@ -43,6 +44,23 @@ export const expenseFromDoc = (snap: DocumentSnapshot<DocumentData>): Expense =>
     amountCents: num(d.amountCents),
     categoryId: str(d.categoryId),
     spentAt: toDate(d.spentAt),
+    note: str(d.note),
+    createdAt: toDate(d.createdAt),
+    updatedAt: toDate(d.updatedAt),
+  }
+}
+
+const PERIOD_TYPES: readonly PastPeriodType[] = ['month', 'year', 'range']
+
+export const pastRecordFromDoc = (snap: DocumentSnapshot<DocumentData>): PastRecord => {
+  const d = snap.data() ?? {}
+  return {
+    id: snap.id,
+    amountCents: num(d.amountCents),
+    categoryId: typeof d.categoryId === 'string' ? d.categoryId : null,
+    periodType: PERIOD_TYPES.includes(d.periodType) ? d.periodType : 'range',
+    start: str(d.start),
+    end: str(d.end),
     note: str(d.note),
     createdAt: toDate(d.createdAt),
     updatedAt: toDate(d.updatedAt),

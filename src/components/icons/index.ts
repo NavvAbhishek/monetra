@@ -12,6 +12,7 @@ export {
   Download,
   Eye,
   EyeOff,
+  History,
   House,
   Inbox,
   LayoutGrid,

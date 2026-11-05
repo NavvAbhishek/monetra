@@ -7,3 +7,5 @@ export const categoriesCol = (uid: string) => collection(getDb(), 'users', uid, 
 export const categoryRef = (uid: string, id: string) => doc(getDb(), 'users', uid, 'categories', id)
 export const expensesCol = (uid: string) => collection(getDb(), 'users', uid, 'expenses')
 export const expenseRef = (uid: string, id: string) => doc(getDb(), 'users', uid, 'expenses', id)
+export const pastRecordsCol = (uid: string) => collection(getDb(), 'users', uid, 'pastRecords')
+export const pastRecordRef = (uid: string, id: string) => doc(getDb(), 'users', uid, 'pastRecords', id)

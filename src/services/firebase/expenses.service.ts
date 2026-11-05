@@ -1,5 +1,9 @@
 import {
+  count,
   deleteDoc,
+  getAggregateFromServer,
+  limit,
+  sum,
   doc,
   getCountFromServer,
   getDoc,
@@ -18,7 +22,7 @@ import type { ExpensesService } from '../contracts'
 import { ServiceError } from '../errors'
 import { expenseFromDoc, toTimestamp } from './converters'
 import { guard } from './errors'
-import { categoryRef, expenseRef, expensesCol } from './paths'
+import { categoriesCol, categoryRef, expenseRef, expensesCol } from './paths'
 
 /** Firestore allows 500 writes per batch; stay under it. */
 const BATCH_LIMIT = 450
@@ -88,6 +92,32 @@ export const expensesFirebase: ExpensesService = {
   expense_countForCategory: guard(async (uid, categoryId) => {
     const snap = await getCountFromServer(query(expensesCol(uid), where('categoryId', '==', categoryId)))
     return snap.data().count
+  }),
+
+  /**
+   * All-time totals with server-side aggregation: billed ~1 read per 1,000 expenses per query,
+   * instead of downloading every expense (keeps the Past spending page free at any size).
+   */
+  expense_totals: guard(async (uid) => {
+    const col = expensesCol(uid)
+    const [overall, first, categories] = await Promise.all([
+      getAggregateFromServer(col, { total: sum('amountCents'), count: count() }),
+      getDocs(query(col, orderBy('spentAt', 'asc'), limit(1))),
+      getDocs(categoriesCol(uid)),
+    ])
+    const perCategory = await Promise.all(
+      categories.docs.map(async (c) => {
+        const agg = await getAggregateFromServer(query(col, where('categoryId', '==', c.id)), { total: sum('amountCents') })
+        return [c.id, agg.data().total ?? 0] as const
+      }),
+    )
+    const firstDoc = first.docs[0]
+    return {
+      totalCents: overall.data().total ?? 0,
+      count: overall.data().count,
+      byCategory: Object.fromEntries(perCategory.filter(([, cents]) => cents > 0)),
+      firstSpentAt: firstDoc ? expenseFromDoc(firstDoc).spentAt : null,
+    }
   }),
 
   expense_reassignCategory: guard(async (uid, fromCategoryId, toCategoryId) => {

@@ -50,6 +50,20 @@ service cloud.firestore {
         && d.updatedAt is timestamp;
     }
 
+    // users/{uid}/pastRecords/{id} — spending from before Monetra (CLAUDE.md §7.5)
+    function validPastRecord(d) {
+      return hasExactly(d, ['amountCents', 'categoryId', 'periodType', 'start', 'end', 'note', 'createdAt', 'updatedAt'])
+        && d.amountCents is int && d.amountCents > 0 && d.amountCents < 100000000000
+        && (d.categoryId == null || isText(d.categoryId, 1, 128))
+        && d.periodType in ['month', 'year', 'range']
+        && d.start is string && d.start.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && d.end is string && d.end.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && d.start <= d.end
+        && isText(d.note, 0, 120)
+        && d.createdAt is timestamp
+        && d.updatedAt is timestamp;
+    }
+
     // ---------- rules ----------
     match /users/{uid} {
       allow read: if isOwner(uid);
@@ -74,6 +88,15 @@ service cloud.firestore {
         allow create: if isOwner(uid) && validExpense(request.resource.data);
         allow update: if isOwner(uid)
           && validExpense(request.resource.data)
+          && request.resource.data.createdAt == resource.data.createdAt;
+        allow delete: if isOwner(uid);
+      }
+
+      match /pastRecords/{recordId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && validPastRecord(request.resource.data);
+        allow update: if isOwner(uid)
+          && validPastRecord(request.resource.data)
           && request.resource.data.createdAt == resource.data.createdAt;
         allow delete: if isOwner(uid);
       }

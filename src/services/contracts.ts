@@ -1,6 +1,7 @@
 import type { AuthUser } from '@/types/auth'
 import type { Category, CategoryInput } from '@/types/category'
 import type { Expense, ExpenseInput } from '@/types/expense'
+import type { ExpenseTotals, PastRecord, PastRecordInput } from '@/types/pastRecord'
 import type { DateRange } from '@/types/period'
 import type { Profile, ProfilePatch } from '@/types/profile'
 
@@ -56,6 +57,19 @@ export interface ExpensesService {
   expense_countForCategory(uid: string, categoryId: string): Promise<number>
   /** Moves every expense from one category to another. Returns how many were moved. */
   expense_reassignCategory(uid: string, fromCategoryId: string, toCategoryId: string): Promise<number>
+  /** All-time totals of tracked expenses (overall + per category + first date) — server-side sums, cheap on Firestore. */
+  expense_totals(uid: string): Promise<ExpenseTotals>
+}
+
+/** Spending from before Monetra (CLAUDE.md §7.5). Never mixed into expenses. */
+export interface PastRecordsService {
+  /** Newest period first. */
+  pastRecord_list(uid: string): Promise<PastRecord[]>
+  pastRecord_create(uid: string, input: PastRecordInput): Promise<PastRecord>
+  pastRecord_update(uid: string, id: string, input: PastRecordInput): Promise<PastRecord>
+  pastRecord_delete(uid: string, id: string): Promise<void>
+  /** When a category is deleted: move its past records to another category, or to null ("All categories"). */
+  pastRecord_reassignCategory(uid: string, fromCategoryId: string, toCategoryId: string | null): Promise<number>
 }
 
 export interface Backend {
@@ -63,4 +77,5 @@ export interface Backend {
   profile: ProfileService
   categories: CategoriesService
   expenses: ExpensesService
+  pastRecords: PastRecordsService
 }

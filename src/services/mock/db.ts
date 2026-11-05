@@ -1,5 +1,6 @@
 import type { Category } from '@/types/category'
 import type { Expense } from '@/types/expense'
+import type { PastRecord } from '@/types/pastRecord'
 import type { Profile } from '@/types/profile'
 import { newId } from '@/utils/id'
 
@@ -20,6 +21,8 @@ export type MockDb = {
   categories: Record<string, Category[]>
   /** keyed by uid */
   expenses: Record<string, Expense[]>
+  /** keyed by uid — added after v1, so older saved dbs may not have it */
+  pastRecords?: Record<string, PastRecord[]>
 }
 
 /** Fake network delay so loading states are visible while building the UI. */

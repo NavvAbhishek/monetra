@@ -13,6 +13,9 @@ export const QUERY_KEYS = {
   expenses: (range: DateRange) =>
     ['expenses', { start: range.start.toISOString(), end: range.end.toISOString() }] as const,
   expense: (id: string) => ['expenses', 'detail', id] as const,
+  /** All-time tracked totals (Past spending page). Under 'expenses' so every expense change refreshes it. */
+  expenseTotals: ['expenses', 'totals'] as const,
+  pastRecords: ['pastRecords'] as const,
   /** Number of expenses using a category (delete dialog). */
   expenseCount: (categoryId: string) => ['expenses', 'count', categoryId] as const,
 }

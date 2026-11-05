@@ -26,6 +26,16 @@ export const useGetCategoryExpenseCountQuery = (categoryId: string | undefined, 
   })
 }
 
+/** All-time totals of tracked expenses (server-side sums) for the Past spending page. */
+export const useGetExpenseTotalsQuery = () => {
+  const uid = useUid()
+  return useQuery({
+    queryKey: QUERY_KEYS.expenseTotals,
+    queryFn: () => API.expenses.expense_totals(uid as string),
+    enabled: !!uid,
+  })
+}
+
 /** One expense for the edit form. `id` undefined (new expense) disables the query. */
 export const useGetExpenseQuery = (id: string | undefined) => {
   const uid = useUid()

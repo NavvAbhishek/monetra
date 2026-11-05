@@ -40,11 +40,14 @@ export const useDeleteCategoryMutation = () => {
     mutationFn: async ({ id, moveExpensesTo }: { id: string; moveExpensesTo?: string }) => {
       const uid = requireUid()
       if (moveExpensesTo) await API.expenses.expense_reassignCategory(uid, id, moveExpensesTo)
+      // Past spending records follow the expenses, or become "All categories" — never lost.
+      await API.pastRecords.pastRecord_reassignCategory(uid, id, moveExpensesTo ?? null)
       await API.categories.category_delete(uid, id)
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories })
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.expensesRoot }) // expenses may have moved
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.pastRecords })
       Notification.success('Category deleted')
     },
     onError: (error) => Notification.error(errorMessage(error)),

@@ -89,6 +89,23 @@ export const expensesMock: ExpensesService = {
     return listFor(uid).filter((e) => e.categoryId === categoryId).length
   },
 
+  async expense_totals(uid) {
+    await delay()
+    const all = listFor(uid)
+    const byCategory: Record<string, number> = {}
+    let first: Date | null = null
+    for (const e of all) {
+      byCategory[e.categoryId] = (byCategory[e.categoryId] ?? 0) + e.amountCents
+      if (!first || e.spentAt < first) first = e.spentAt
+    }
+    return {
+      totalCents: all.reduce((sum, e) => sum + e.amountCents, 0),
+      count: all.length,
+      byCategory,
+      firstSpentAt: first ? new Date(first) : null,
+    }
+  },
+
   async expense_reassignCategory(uid, fromCategoryId, toCategoryId) {
     await delay()
     requireCategory(uid, fromCategoryId)

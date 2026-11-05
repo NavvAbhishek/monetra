@@ -8,6 +8,8 @@ export type ServiceErrorCode =
   | 'category/last-category'
   | 'expense/not-found'
   | 'expense/invalid'
+  | 'pastRecord/not-found'
+  | 'pastRecord/invalid'
   | 'auth/cancelled'
   | 'auth/too-many-requests'
   | 'auth/not-enabled'
