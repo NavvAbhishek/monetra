@@ -1,11 +1,82 @@
 rules_version = '2';
 
-// Baseline: each signed-in user can only access their own data under users/{uid}.
-// Field validation (amountCents, colourIndex, lengths) is added in Phase 12 — see CLAUDE.md §5.3.
+// Monetra security rules (CLAUDE.md §5.3).
+// - A user can only read / write their own data under users/{uid}.
+// - Every write is validated: exact field set, types, ranges, lengths.
+// - Everything else is denied.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+    // ---------- helpers ----------
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isText(value, min, max) {
+      return value is string && value.size() >= min && value.size() <= max;
+    }
+
+    function hasExactly(data, fields) {
+      return data.keys().hasAll(fields) && data.keys().hasOnly(fields);
+    }
+
+    // users/{uid}
+    function validProfile(d) {
+      return hasExactly(d, ['name', 'email', 'currency', 'createdAt'])
+        && isText(d.name, 1, 50)
+        && isText(d.email, 0, 254)
+        && d.currency is string && d.currency.matches('^[A-Z]{3}$')
+        && d.createdAt is timestamp;
+    }
+
+    // users/{uid}/categories/{id}
+    function validCategory(d) {
+      return hasExactly(d, ['name', 'emoji', 'colourIndex', 'order', 'createdAt'])
+        && isText(d.name, 1, 24)
+        && isText(d.emoji, 1, 16)
+        && d.colourIndex is int && d.colourIndex >= 0 && d.colourIndex <= 5
+        && d.order is int && d.order >= 0
+        && d.createdAt is timestamp;
+    }
+
+    // users/{uid}/expenses/{id} — money is integer cents (CLAUDE.md §7.2)
+    function validExpense(d) {
+      return hasExactly(d, ['amountCents', 'categoryId', 'spentAt', 'note', 'createdAt', 'updatedAt'])
+        && d.amountCents is int && d.amountCents > 0 && d.amountCents < 100000000000
+        && isText(d.categoryId, 1, 128)
+        && d.spentAt is timestamp
+        && isText(d.note, 0, 120)
+        && d.createdAt is timestamp
+        && d.updatedAt is timestamp;
+    }
+
+    // ---------- rules ----------
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && validProfile(request.resource.data);
+      allow update: if isOwner(uid)
+        && validProfile(request.resource.data)
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if false;
+
+      match /categories/{categoryId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && validCategory(request.resource.data);
+        allow update: if isOwner(uid)
+          && validCategory(request.resource.data)
+          && request.resource.data.createdAt == resource.data.createdAt;
+        allow delete: if isOwner(uid);
+      }
+
+      match /expenses/{expenseId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && validExpense(request.resource.data);
+        allow update: if isOwner(uid)
+          && validExpense(request.resource.data)
+          && request.resource.data.createdAt == resource.data.createdAt;
+        allow delete: if isOwner(uid);
+      }
     }
 
     // Everything else is denied.

@@ -1,20 +1,18 @@
 import type { Backend } from './contracts'
+import { firebaseBackend } from './firebase'
 import { mockBackend } from './mock'
 
 /**
  * The one backend the app talks to. Pick it with VITE_DATA_SOURCE in .env.local:
- *   mock      (default) — in-browser fake backend, no Firebase needed
- *   firebase  — real backend, added in Phase 12
+ *   firebase — the real backend (Firebase Auth + Firestore)
+ *   mock     — in-browser fake backend with sample data (offline demo, UI work)
+ * Both implement the same contract (contracts.ts), so nothing else changes.
  *
  * Usage: `API.expenses.expense_create(uid, input)`
  */
 const source = import.meta.env.VITE_DATA_SOURCE ?? 'mock'
 
-if (source === 'firebase') {
-  throw new Error('VITE_DATA_SOURCE=firebase is not available yet — the Firebase backend is built in Phase 12.')
-}
-
-const API: Backend = mockBackend
+const API: Backend = source === 'firebase' ? firebaseBackend : mockBackend
 
 export default API
 export { ServiceError, isServiceError } from './errors'

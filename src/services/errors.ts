@@ -8,6 +8,12 @@ export type ServiceErrorCode =
   | 'category/last-category'
   | 'expense/not-found'
   | 'expense/invalid'
+  | 'auth/cancelled'
+  | 'auth/too-many-requests'
+  | 'auth/not-enabled'
+  | 'network'
+  | 'permission-denied'
+  | 'unknown'
 
 /**
  * Error thrown by every backend (mock and Firebase) so the UI can react to `code`
