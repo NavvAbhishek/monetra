@@ -1,0 +1,27 @@
+// Single re-export of every lucide icon the app uses.
+// Import as: import * as Icon from "@/components/icons"
+export {
+  ArrowLeft,
+  Calendar,
+  ChartPie,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Eye,
+  EyeOff,
+  House,
+  Inbox,
+  LayoutGrid,
+  LoaderCircle,
+  LogOut,
+  Pencil,
+  Plus,
+  ReceiptText,
+  Search,
+  Settings,
+  Trash2,
+  TriangleAlert,
+  X,
+} from 'lucide-react'

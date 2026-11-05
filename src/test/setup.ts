@@ -14,3 +14,6 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: () => false,
   }),
 })
+
+// jsdom has no scrollTo — used by the router's scroll restoration
+window.scrollTo = (() => {}) as typeof window.scrollTo
