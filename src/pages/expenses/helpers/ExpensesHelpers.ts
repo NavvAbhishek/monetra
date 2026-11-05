@@ -23,4 +23,3 @@ export const getMode = (pathname: string, expenseId: string | undefined): Expens
 export const getPeriodHeading = (period: ListPeriod, isCurrent: boolean, subtitle: string): string =>
   isCurrent ? `This ${period}` : subtitle
 
-export const UNDO_WINDOW_MS = 5000

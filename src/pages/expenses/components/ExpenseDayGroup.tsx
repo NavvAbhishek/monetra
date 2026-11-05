@@ -18,7 +18,7 @@ const ExpenseDayGroup = ({ group, ctx }: { group: DayGroup; ctx: ExpensesCtx }) 
         const category = ctx.categoryById.get(expense.categoryId)
         return (
           <li key={expense.id} className="border-b border-muted last:border-b-0">
-            <SwipeableRow expenseId={expense.id} onDelete={() => ctx.requestDelete(expense)}>
+            <SwipeableRow expenseId={expense.id} onDelete={() => ctx.askDelete(expense)}>
               <Link
                 to="/expenses/$expenseId"
                 params={{ expenseId: expense.id }}

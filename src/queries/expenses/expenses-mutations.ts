@@ -75,7 +75,7 @@ export const useUpdateExpenseMutation = () => {
   })
 }
 
-/** No success toast: the caller shows its own "Deleted · Undo" message (CLAUDE.md §7.3). */
+/** Called after the user confirmed in DeleteExpenseDialog (CLAUDE.md §7.3). */
 export const useDeleteExpenseMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -85,6 +85,7 @@ export const useDeleteExpenseMutation = () => {
       restore(queryClient, snapshot)
       Notification.error(errorMessage(error))
     },
+    onSuccess: () => Notification.success('Expense deleted'),
     onSettled: () => refresh(queryClient),
   })
 }

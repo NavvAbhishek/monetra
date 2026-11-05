@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
 import { Link } from '@/router/navigation'
 import type { ExpensesCtx } from '../hooks/useExpenses'
-import { useDeleteExpenseNow } from '../hooks/useDeleteExpenseNow'
+import { useState } from 'react'
+import DeleteExpenseDialog from './DeleteExpenseDialog'
 
 /**
  * Mobile full-screen add / edit (M3): back button, title, category tiles, amount card, save.
@@ -14,7 +15,7 @@ import { useDeleteExpenseNow } from '../hooks/useDeleteExpenseNow'
 const ExpenseEditorScreen = ({ ctx }: { ctx: ExpensesCtx }) => {
   const { editedExpense, categories, currency, closeEditor } = ctx
   const formCtx = useExpenseForm({ expense: editedExpense, categories, currency, onSaved: closeEditor })
-  const { deleteNow, isDeleting } = useDeleteExpenseNow(closeEditor)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   return (
     <div className="flex flex-col gap-4">
@@ -29,8 +30,7 @@ const ExpenseEditorScreen = ({ ctx }: { ctx: ExpensesCtx }) => {
             variant="danger-soft"
             size="lg"
             aria-label="Delete expense"
-            disabled={isDeleting}
-            onClick={() => deleteNow(editedExpense.id)}
+            onClick={() => setConfirmDelete(true)}
           >
             <Icon.Trash2 aria-hidden />
           </IconButton>
@@ -57,6 +57,14 @@ const ExpenseEditorScreen = ({ ctx }: { ctx: ExpensesCtx }) => {
           {editedExpense ? 'Save changes' : 'Add expense'}
         </Button>
       </div>
+
+      <DeleteExpenseDialog
+        expense={confirmDelete && editedExpense ? editedExpense : null}
+        currency={currency}
+        categoryName={editedExpense ? ctx.categoryById.get(editedExpense.categoryId)?.name : undefined}
+        onClose={() => setConfirmDelete(false)}
+        onDeleted={closeEditor}
+      />
     </div>
   )
 }

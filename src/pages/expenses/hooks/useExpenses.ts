@@ -3,12 +3,12 @@ import { useIsMobile } from '@/hooks/use-mobile'
 import { useGetCategoriesQuery } from '@/queries/categories/categories-queries'
 import { useGetExpenseQuery, useGetExpensesQuery } from '@/queries/expenses/expenses-queries'
 import { useGetProfileQuery } from '@/queries/profile/profile-queries'
+import type { Expense } from '@/types/expense'
 import { useLocation, useNavigate, useParams } from '@/router/navigation'
 import { filterExpenses, groupByDay, sumCents } from '@/utils/aggregate'
 import { DEFAULT_CURRENCY } from '@/utils/money'
 import { getPeriodRange, getPeriodSubtitle, isInRange, shiftAnchor } from '@/utils/period'
 import { getMode, getPeriodHeading, type ListPeriod } from '../helpers/ExpensesHelpers'
-import { useExpenseDeleteUndo } from './useExpenseDeleteUndo'
 
 /** Everything the expenses page needs: the period's expenses, filters, and which screen the URL asks for. */
 export const useExpenses = () => {
@@ -33,16 +33,13 @@ export const useExpenses = () => {
   const categoriesQuery = useGetCategoriesQuery()
   const profileQuery = useGetProfileQuery()
   const editedQuery = useGetExpenseQuery(mode.kind === 'edit' ? mode.id : undefined)
-  const undo = useExpenseDeleteUndo()
+  const [toDelete, setToDelete] = useState<Expense | null>(null)
 
   const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data])
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
   const currency = profileQuery.data?.currency ?? DEFAULT_CURRENCY
 
-  const inPeriod = useMemo(
-    () => (expensesQuery.data ?? []).filter((e) => !undo.pendingIds.has(e.id)),
-    [expensesQuery.data, undo.pendingIds],
-  )
+  const inPeriod = useMemo(() => expensesQuery.data ?? [], [expensesQuery.data])
   const expenses = useMemo(() => filterExpenses(inPeriod, { query, categoryId }), [inPeriod, query, categoryId])
 
   const dayGroups = useMemo(() => groupByDay(expenses), [expenses])
@@ -86,7 +83,10 @@ export const useExpenses = () => {
       void expensesQuery.refetch()
       void categoriesQuery.refetch()
     },
-    requestDelete: undo.requestDelete,
+    // delete asks first (CLAUDE.md §7.3)
+    toDelete,
+    askDelete: setToDelete,
+    closeDelete: () => setToDelete(null),
     // editor
     editedExpense: editedQuery.data ?? undefined,
     isEditorLoading: mode.kind === 'edit' && (editedQuery.isPending || categoriesQuery.isPending),

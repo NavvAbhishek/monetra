@@ -63,7 +63,7 @@ const ExpensesTable = ({ ctx }: { ctx: ExpensesCtx }) => {
                       variant="danger-soft"
                       size="sm"
                       aria-label={`Delete ${expense.note || 'expense'}`}
-                      onClick={() => ctx.requestDelete(expense)}
+                      onClick={() => ctx.askDelete(expense)}
                     >
                       <Icon.Trash2 aria-hidden />
                     </IconButton>

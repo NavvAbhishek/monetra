@@ -7,6 +7,7 @@ import { IconButton } from '@/components/ui/icon-button'
 import { PageHeader } from '@/components/ui/page-header'
 import { Link } from '@/router/navigation'
 import { formatMoney } from '@/utils/money'
+import DeleteExpenseDialog from './components/DeleteExpenseDialog'
 import ExpenseDayGroup from './components/ExpenseDayGroup'
 import ExpenseDialog from './components/ExpenseDialog'
 import ExpenseEditorScreen from './components/ExpenseEditorScreen'
@@ -111,6 +112,13 @@ const Expenses = () => {
       {isMobile ? <MobileFilters ctx={ctx} searchOpen={searchOpen} /> : <ExpensesToolbar ctx={ctx} />}
 
       {content}
+
+      <DeleteExpenseDialog
+        expense={ctx.toDelete}
+        currency={ctx.currency}
+        categoryName={ctx.toDelete ? ctx.categoryById.get(ctx.toDelete.categoryId)?.name : undefined}
+        onClose={ctx.closeDelete}
+      />
 
       {/* ---- desktop add / edit modal (D3) ---- */}
       {!isMobile && editing && !isEditorLoading && !isLoading && (

@@ -3,7 +3,8 @@ import { useExpenseForm } from '@/components/ExpenseForm/hooks/useExpenseForm'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from '@/components/ui/dialog'
 import type { ExpensesCtx } from '../hooks/useExpenses'
-import { useDeleteExpenseNow } from '../hooks/useDeleteExpenseNow'
+import { useState } from 'react'
+import DeleteExpenseDialog from './DeleteExpenseDialog'
 import ExpenseNotFound from './ExpenseNotFound'
 
 /**
@@ -15,7 +16,7 @@ const ExpenseDialog = ({ ctx }: { ctx: ExpensesCtx }) => {
   const { mode, editedExpense, editorNotFound, categories, currency, closeEditor } = ctx
   const isEdit = mode.kind === 'edit'
   const formCtx = useExpenseForm({ expense: editedExpense, categories, currency, onSaved: closeEditor })
-  const { deleteNow, isDeleting } = useDeleteExpenseNow(closeEditor)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   return (
     <Dialog open onOpenChange={(open) => !open && closeEditor()}>
@@ -43,8 +44,7 @@ const ExpenseDialog = ({ ctx }: { ctx: ExpensesCtx }) => {
                   variant="danger-ghost"
                   size="lg"
                   className="px-1.5"
-                  loading={isDeleting}
-                  onClick={() => deleteNow(editedExpense.id)}
+                  onClick={() => setConfirmDelete(true)}
                 >
                   Delete
                 </Button>
@@ -62,6 +62,13 @@ const ExpenseDialog = ({ ctx }: { ctx: ExpensesCtx }) => {
           </>
         )}
       </DialogContent>
+      <DeleteExpenseDialog
+        expense={confirmDelete && editedExpense ? editedExpense : null}
+        currency={currency}
+        categoryName={editedExpense ? ctx.categoryById.get(editedExpense.categoryId)?.name : undefined}
+        onClose={() => setConfirmDelete(false)}
+        onDeleted={closeEditor}
+      />
     </Dialog>
   )
 }

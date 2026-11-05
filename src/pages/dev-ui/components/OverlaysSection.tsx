@@ -1,5 +1,7 @@
 import * as Icon from '@/components/icons'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog'
 import {
   DropdownMenu,
@@ -16,8 +18,33 @@ import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTrigger } from '@/c
 import { Notification } from '@/utils/notification'
 import Section, { Row } from './Section'
 
+const ConfirmDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button variant="danger-soft" onClick={() => setOpen(true)}>
+        Delete something
+      </Button>
+      <ConfirmDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Delete this expense?"
+        description="This can’t be undone."
+        onConfirm={() => {
+          setOpen(false)
+          Notification.success('Deleted')
+        }}
+      />
+    </>
+  )
+}
+
 const OverlaysSection = () => (
-  <Section title="Overlays & feedback" description="dialog · sheet · popover · dropdown-menu · toasts (utils/notification)">
+  <Section title="Overlays & feedback" description="dialog · confirm-dialog · sheet · popover · dropdown-menu · toasts (utils/notification)">
+    <Row label="ConfirmDialog (every delete asks first)">
+      <ConfirmDemo />
+    </Row>
+
     <Row label="Dialog (D3 modal)">
       <Dialog>
         <DialogTrigger asChild>
