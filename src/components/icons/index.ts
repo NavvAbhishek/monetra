@@ -9,6 +9,7 @@ export {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
+  Download,
   Eye,
   EyeOff,
   House,

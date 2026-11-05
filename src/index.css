@@ -33,6 +33,21 @@
   --overlay: rgb(29 22 56 / 0.42); /* modal backdrop */
   --highlight: #ffd166; /* the dot at the end of the hero line chart */
 
+  /* ---------- Theme colours (Settings → Theme colour) ----------
+     The chosen one becomes --primary (see the [data-theme-color] block below).
+     All are dark enough for white text (WCAG AA). */
+  --theme-violet: #6c4df5; /* default — the design colour */
+  --theme-indigo: #4f46e5;
+  --theme-blue: #2563eb;
+  --theme-ocean: #0369a1;
+  --theme-teal: #0f766e;
+  --theme-green: #15803d;
+  --theme-amber: #b45309;
+  --theme-orange: #c2410c;
+  --theme-rose: #e11d48;
+  --theme-pink: #be185d;
+  --theme-graphite: #334155;
+
   /* ---------- Category colours (colourIndex 0–5) ---------- */
   --cat-0-soft: #ffe1d6;
   --cat-0-strong: #d4562a;
@@ -66,6 +81,24 @@
   --ring: var(--primary);
 }
 
+/*
+ * Custom theme colour. `lib/theme.ts` sets --primary to one of the --theme-* colours on <html>
+ * and adds this attribute; every shade of the primary family is then derived from it.
+ * The default theme has no attribute and keeps the design's exact values above.
+ */
+:root[data-theme-color] {
+  --primary-hover: color-mix(in srgb, var(--primary) 82%, black);
+  --primary-soft: color-mix(in srgb, var(--primary) 13%, white);
+  --primary-tint: color-mix(in srgb, var(--primary) 20%, white);
+  --bar: color-mix(in srgb, var(--primary) 27%, white);
+  --bar-empty: color-mix(in srgb, var(--primary) 11%, white);
+  --track: color-mix(in srgb, var(--primary) 15%, white);
+  --bg: color-mix(in srgb, var(--primary) 6%, white);
+  --muted: color-mix(in srgb, var(--primary) 9%, white);
+  --line: color-mix(in srgb, var(--primary) 16%, white);
+  --line-soft: color-mix(in srgb, var(--primary) 5%, white);
+}
+
 @theme inline {
   --font-sans: "Bricolage Grotesque", system-ui, sans-serif;
 
@@ -92,6 +125,18 @@
   --color-danger-foreground: var(--danger-foreground);
   --color-danger-soft: var(--danger-soft);
   --color-overlay: var(--overlay);
+
+  --color-theme-violet: var(--theme-violet);
+  --color-theme-indigo: var(--theme-indigo);
+  --color-theme-blue: var(--theme-blue);
+  --color-theme-ocean: var(--theme-ocean);
+  --color-theme-teal: var(--theme-teal);
+  --color-theme-green: var(--theme-green);
+  --color-theme-amber: var(--theme-amber);
+  --color-theme-orange: var(--theme-orange);
+  --color-theme-rose: var(--theme-rose);
+  --color-theme-pink: var(--theme-pink);
+  --color-theme-graphite: var(--theme-graphite);
   --color-highlight: var(--highlight);
 
   --color-cat-0-soft: var(--cat-0-soft);
@@ -184,7 +229,7 @@
   --text-emoji-3xl--line-height: 1;
 
   /* ---------- Shadows → shadow-* ---------- */
-  --shadow-fab: 0 10px 20px rgba(108, 77, 245, 0.35);
+  --shadow-fab: 0 10px 20px color-mix(in srgb, var(--primary) 35%, transparent); /* follows the theme colour */
   --shadow-modal: 0 30px 80px rgba(29, 22, 56, 0.35);
   --shadow-panel: 0 0 0 1px rgba(29, 22, 56, 0.1), 0 20px 50px rgba(29, 22, 56, 0.15);
   --shadow-side: -10px 0 30px rgba(29, 22, 56, 0.06);

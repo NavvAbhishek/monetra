@@ -1,6 +1,8 @@
 import { type QueryClient, useMutation, useQueryClient } from '@tanstack/react-query'
 import API from '@/services'
 import type { Expense, ExpenseInput } from '@/types/expense'
+import { format } from 'date-fns'
+import { downloadCsv, expensesToCsv } from '@/utils/csv'
 import { newId } from '@/utils/id'
 import { Notification } from '@/utils/notification'
 import { isExpenseListQuery, QUERY_KEYS, rangeFromKey, isExpenseListKey } from '../query-keys'
@@ -86,3 +88,23 @@ export const useDeleteExpenseMutation = () => {
     onSettled: () => refresh(queryClient),
   })
 }
+
+/** Every expense, all time — for the CSV export. Reads all documents, so only on demand. */
+const ALL_TIME = { start: new Date(2000, 0, 1), end: new Date(2100, 0, 1) }
+
+/** Settings → "Download CSV": all expenses with category names, oldest first. */
+export const useExportExpensesMutation = () =>
+  useMutation({
+    mutationFn: async (currency: string) => {
+      const uid = requireUid()
+      const [expenses, categories] = await Promise.all([
+        API.expenses.expense_listInRange(uid, ALL_TIME),
+        API.categories.category_list(uid),
+      ])
+      downloadCsv(`monetra-expenses-${format(new Date(), 'yyyy-MM-dd')}.csv`, expensesToCsv(expenses, categories, currency))
+      return expenses.length
+    },
+    onSuccess: (count) =>
+      count > 0 ? Notification.success(`Exported ${count} expenses`) : Notification.info('No expenses to export yet'),
+    onError: (error) => Notification.error(errorMessage(error)),
+  })
