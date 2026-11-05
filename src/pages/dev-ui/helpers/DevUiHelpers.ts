@@ -47,6 +47,7 @@ export const BUTTON_VARIANTS = [
   'primary',
   'secondary',
   'surface',
+  'muted',
   'outline',
   'ghost',
   'danger',

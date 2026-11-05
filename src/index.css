@@ -31,6 +31,7 @@
   --danger-foreground: #ffffff;
   --danger-soft: #fff0ee;
   --overlay: rgb(29 22 56 / 0.42); /* modal backdrop */
+  --highlight: #ffd166; /* the dot at the end of the hero line chart */
 
   /* ---------- Category colours (colourIndex 0–5) ---------- */
   --cat-0-soft: #ffe1d6;
@@ -91,6 +92,7 @@
   --color-danger-foreground: var(--danger-foreground);
   --color-danger-soft: var(--danger-soft);
   --color-overlay: var(--overlay);
+  --color-highlight: var(--highlight);
 
   --color-cat-0-soft: var(--cat-0-soft);
   --color-cat-0-strong: var(--cat-0-strong);
@@ -164,6 +166,8 @@
   --text-5xl--line-height: 1.15;
   --text-hero: 42px;
   --text-hero--line-height: 1.15;
+  --text-display: 54px; /* desktop "You spent" total */
+  --text-display--line-height: 1.1;
 
   /* Emoji sizes (inside emoji boxes / tiles) */
   --text-emoji-sm: 16px;

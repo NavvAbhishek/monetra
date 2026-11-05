@@ -64,3 +64,13 @@ export const formatMoney = (
   currency: string = DEFAULT_CURRENCY,
   { compact = false }: FormatMoneyOptions = {},
 ): string => getFormatter(currency, compact).format(fromCents(cents, currency))
+
+/** "$", "€", "Rs"… for a currency code (shown beside the amount input). */
+export const getCurrencySymbol = (currency: string = DEFAULT_CURRENCY): string => {
+  try {
+    const parts = new Intl.NumberFormat('en-US', { style: 'currency', currency, currencyDisplay: 'narrowSymbol' }).formatToParts(0)
+    return parts.find((p) => p.type === 'currency')?.value ?? currency
+  } catch {
+    return currency
+  }
+}

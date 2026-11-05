@@ -1,4 +1,4 @@
-import { formatMoney, fromCents, getCurrencyDigits, toCents } from './money'
+import { formatMoney, fromCents, getCurrencyDigits, getCurrencySymbol, toCents } from './money'
 
 describe('toCents', () => {
   it.each([
@@ -56,5 +56,17 @@ describe('formatMoney', () => {
 
   it('falls back to USD for an invalid currency code', () => {
     expect(formatMoney(100, 'NOPE')).toBe('$1.00')
+  })
+})
+
+describe('getCurrencySymbol', () => {
+  it('returns the symbol', () => {
+    expect(getCurrencySymbol('USD')).toBe('$')
+    expect(getCurrencySymbol('EUR')).toBe('€')
+    expect(getCurrencySymbol('GBP')).toBe('£')
+  })
+
+  it('falls back to the code for unknown currencies', () => {
+    expect(getCurrencySymbol('NOPE')).toBe('NOPE')
   })
 })

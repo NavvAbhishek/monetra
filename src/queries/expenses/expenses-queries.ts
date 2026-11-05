@@ -5,12 +5,12 @@ import { QUERY_KEYS } from '../query-keys'
 import { useUid } from '../session'
 
 /** Expenses in `[range.start, range.end)`, newest first. Keeps the old list while the next range loads. */
-export const useGetExpensesQuery = (range: DateRange) => {
+export const useGetExpensesQuery = (range: DateRange, { enabled = true }: { enabled?: boolean } = {}) => {
   const uid = useUid()
   return useQuery({
     queryKey: QUERY_KEYS.expenses(range),
     queryFn: () => API.expenses.expense_listInRange(uid as string, range),
-    enabled: !!uid,
+    enabled: !!uid && enabled,
     placeholderData: keepPreviousData,
   })
 }

@@ -10,7 +10,8 @@ const amountVariants = cva('tabular-nums whitespace-nowrap', {
       md: 'text-xl font-bold', // tiles
       lg: 'text-2xl font-extrabold', // panel header
       xl: 'text-4xl font-extrabold tracking-tight',
-      hero: 'text-hero font-extrabold tracking-tight', // "You spent"
+      hero: 'text-hero font-extrabold tracking-tight', // "You spent" (mobile)
+      display: 'text-display font-extrabold tracking-tight', // "You spent" (desktop)
     },
     tone: {
       default: 'text-ink',

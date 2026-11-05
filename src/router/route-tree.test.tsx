@@ -32,10 +32,11 @@ afterEach(() => useAuthStore.getState().reset())
 
 describe('every route renders its page', () => {
   it.each([
-    ['/', 'Dashboard'],
+    ['/', 'Your money'],
     ['/expenses', 'Expenses'],
-    ['/expenses/new', 'Add expense'],
-    ['/expenses/abc123', 'Edit expense abc123'],
+    // desktop: the expenses page with the add / edit modal on top (mobile shows the full-screen editor)
+    ['/expenses/new', 'Expenses'],
+    ['/expenses/abc123', 'Expenses'],
     ['/categories', 'Categories'],
     // desktop: the same page with the side panel open (mobile shows the full-screen editor)
     ['/categories/new', 'Categories'],
@@ -73,7 +74,7 @@ describe('route guards', () => {
 
   it('signed-in users on /login are sent to the dashboard', async () => {
     const router = await renderAt('/login', 'signedIn')
-    expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Your money' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/')
   })
 

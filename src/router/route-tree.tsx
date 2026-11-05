@@ -64,13 +64,13 @@ const expensesRoute = createRoute({
 const expenseNewRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/expenses/new',
-  component: lazyRouteComponent(() => import('@/pages/expenses/pages/ExpenseEditor')),
+  component: lazyRouteComponent(() => import('@/pages/expenses')),
 })
 
 const expenseEditRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/expenses/$expenseId',
-  component: lazyRouteComponent(() => import('@/pages/expenses/pages/ExpenseEditor')),
+  component: lazyRouteComponent(() => import('@/pages/expenses')),
 })
 
 const categoriesRoute = createRoute({
