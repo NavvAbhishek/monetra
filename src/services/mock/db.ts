@@ -22,8 +22,8 @@ export type MockDb = {
   expenses: Record<string, Expense[]>
 }
 
-/** Fake network delay so loading states are visible while building the UI. 0 in tests. */
-export const MOCK_DELAY_MS = import.meta.env.MODE === 'test' ? 0 : 250
+/** Fake network delay so loading states are visible while building the UI. */
+export const MOCK_DELAY_MS = 250
 
 export const delay = (ms: number = MOCK_DELAY_MS): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms))

@@ -83,7 +83,6 @@ const SwipeableRow = ({ expenseId, onDelete, children }: SwipeableRowProps) => {
 
       {/* the row itself */}
       <div
-        data-testid="swipe-row"
         data-open={isOpen || undefined}
         style={{ transform: `translateX(${offset}px)` }}
         className={cn('relative touch-pan-y bg-card', !dragging && 'transition-transform duration-200')}
