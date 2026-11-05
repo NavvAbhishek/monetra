@@ -1,40 +1,33 @@
 import { Suspense } from 'react'
+import MobileTabBar from '@/components/partials/MobileTabBar'
 import PageLoader from '@/components/PageLoader'
-import { Link, Outlet } from '@/router/navigation'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import Sidebar from '@/components/partials/Sidebar'
+import { cn } from '@/lib/utils'
+import { Outlet, useMatches } from '@/router/navigation'
+import { isFullScreenMobileRoute } from '@/routes/app.routes'
 
-// Temporary shell — the real Sidebar / TopBar / MobileTabBar are built in Phase 4.
-const TEMP_LINKS = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/expenses', label: 'Expenses' },
-  { to: '/expenses/new', label: 'Add expense' },
-  { to: '/categories', label: 'Categories' },
-  { to: '/categories/new', label: 'New category' },
-  { to: '/settings', label: 'Settings' },
-  { to: '/login', label: 'Log in' },
-] as const
+/**
+ * Signed-in shell. Desktop (lg+): sidebar + content. Mobile: content + bottom tab bar,
+ * except on the full-screen editor routes (M3, M5) which have their own back button.
+ */
+const DefaultLayout = () => {
+  const routeId = useMatches().at(-1)?.routeId
+  const showTabBar = !isFullScreenMobileRoute(routeId)
 
-const DefaultLayout = () => (
-  <div className="min-h-svh bg-bg">
-    <nav className="flex flex-wrap gap-1 border-b border-line bg-card px-4 py-3">
-      {TEMP_LINKS.map((link) => (
-        <Link
-          key={link.to}
-          to={link.to}
-          activeOptions={{ exact: true }}
-          className="rounded-control px-3 py-1.5 text-sm font-semibold"
-          activeProps={{ className: 'bg-primary-soft text-primary' }}
-          inactiveProps={{ className: 'text-muted-foreground hover:bg-muted' }}
-        >
-          {link.label}
-        </Link>
-      ))}
-    </nav>
-    <main className="mx-auto w-full max-w-5xl p-4 lg:p-8">
-      <Suspense fallback={<PageLoader />}>
-        <Outlet />
-      </Suspense>
-    </main>
-  </div>
-)
+  return (
+    <ProtectedRoute>
+      <div className="min-h-svh bg-bg lg:flex">
+        <Sidebar className="hidden lg:flex" />
+        <main className={cn('min-w-0 flex-1 px-5.5 pt-4 lg:px-9 lg:py-7', showTabBar ? 'pb-28' : 'pb-8', 'lg:pb-7')}>
+          <Suspense fallback={<PageLoader />}>
+            <Outlet />
+          </Suspense>
+        </main>
+        {showTabBar && <MobileTabBar className="lg:hidden" />}
+      </div>
+    </ProtectedRoute>
+  )
+}
 
 export default DefaultLayout

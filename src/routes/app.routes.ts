@@ -6,6 +6,8 @@ export type AppRouteMeta = {
   path: string
   label: string
   parent?: string
+  /** Full-screen editor on mobile (M3, M5): no bottom tab bar, the page has its own back button. */
+  fullScreenOnMobile?: boolean
 }
 
 export const APP_ROUTES: AppRouteMeta[] = [
@@ -16,11 +18,11 @@ export const APP_ROUTES: AppRouteMeta[] = [
   // App
   { path: '/', label: 'Dashboard' },
   { path: '/expenses', label: 'Expenses' },
-  { path: '/expenses/new', label: 'Add expense', parent: '/expenses' },
-  { path: '/expenses/$expenseId', label: 'Edit expense', parent: '/expenses' },
+  { path: '/expenses/new', label: 'Add expense', parent: '/expenses', fullScreenOnMobile: true },
+  { path: '/expenses/$expenseId', label: 'Edit expense', parent: '/expenses', fullScreenOnMobile: true },
   { path: '/categories', label: 'Categories' },
-  { path: '/categories/new', label: 'New category', parent: '/categories' },
-  { path: '/categories/$categoryId', label: 'Edit category', parent: '/categories' },
+  { path: '/categories/new', label: 'New category', parent: '/categories', fullScreenOnMobile: true },
+  { path: '/categories/$categoryId', label: 'Edit category', parent: '/categories', fullScreenOnMobile: true },
   { path: '/settings', label: 'Settings' },
   // Dev only
   { path: '/dev/ui', label: 'UI style guide' },
@@ -46,3 +48,7 @@ export const getDocumentTitle = (routeId: string | undefined): string => {
   const label = routeId ? getRouteLabel(routeIdToPath(routeId)) : undefined
   return label ? `${label} · ${APP_NAME}` : APP_NAME
 }
+
+/** Should the mobile bottom tab bar be hidden on this route? */
+export const isFullScreenMobileRoute = (routeId: string | undefined): boolean =>
+  !!routeId && !!APP_ROUTES.find((r) => r.path === routeIdToPath(routeId))?.fullScreenOnMobile

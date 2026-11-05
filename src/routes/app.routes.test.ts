@@ -1,4 +1,4 @@
-import { getDocumentTitle, getRouteLabel, routeIdToPath } from './app.routes'
+import { getDocumentTitle, getRouteLabel, isFullScreenMobileRoute, routeIdToPath } from './app.routes'
 
 describe('routeIdToPath', () => {
   it.each([
@@ -30,5 +30,22 @@ describe('getDocumentTitle', () => {
 
   it('every route has a label', () => {
     expect(getRouteLabel('/categories/$categoryId')).toBe('Edit category')
+  })
+})
+
+describe('isFullScreenMobileRoute', () => {
+  it('is true for the add / edit editors only', () => {
+    expect(isFullScreenMobileRoute('/_app/expenses/new')).toBe(true)
+    expect(isFullScreenMobileRoute('/_app/expenses/$expenseId')).toBe(true)
+    expect(isFullScreenMobileRoute('/_app/categories/new')).toBe(true)
+    expect(isFullScreenMobileRoute('/_app/categories/$categoryId')).toBe(true)
+  })
+
+  it('is false for list pages, unknown routes and undefined', () => {
+    expect(isFullScreenMobileRoute('/_app/')).toBe(false)
+    expect(isFullScreenMobileRoute('/_app/expenses')).toBe(false)
+    expect(isFullScreenMobileRoute('/_app/settings')).toBe(false)
+    expect(isFullScreenMobileRoute('/nope')).toBe(false)
+    expect(isFullScreenMobileRoute(undefined)).toBe(false)
   })
 })
