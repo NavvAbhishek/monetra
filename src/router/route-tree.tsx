@@ -82,13 +82,13 @@ const categoriesRoute = createRoute({
 const categoryNewRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/categories/new',
-  component: lazyRouteComponent(() => import('@/pages/categories/pages/CategoryEditor')),
+  component: lazyRouteComponent(() => import('@/pages/categories')),
 })
 
 const categoryEditRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/categories/$categoryId',
-  component: lazyRouteComponent(() => import('@/pages/categories/pages/CategoryEditor')),
+  component: lazyRouteComponent(() => import('@/pages/categories')),
 })
 
 const settingsRoute = createRoute({

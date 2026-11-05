@@ -84,6 +84,11 @@ export const expensesMock: ExpensesService = {
     saveDb()
   },
 
+  async expense_countForCategory(uid, categoryId) {
+    await delay()
+    return listFor(uid).filter((e) => e.categoryId === categoryId).length
+  },
+
   async expense_reassignCategory(uid, fromCategoryId, toCategoryId) {
     await delay()
     requireCategory(uid, fromCategoryId)

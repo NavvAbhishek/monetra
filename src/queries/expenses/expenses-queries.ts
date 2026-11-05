@@ -15,6 +15,17 @@ export const useGetExpensesQuery = (range: DateRange) => {
   })
 }
 
+/** How many expenses use a category — the delete dialog asks before moving them. */
+export const useGetCategoryExpenseCountQuery = (categoryId: string | undefined, enabled = true) => {
+  const uid = useUid()
+  return useQuery({
+    queryKey: QUERY_KEYS.expenseCount(categoryId ?? ''),
+    queryFn: () => API.expenses.expense_countForCategory(uid as string, categoryId as string),
+    enabled: !!uid && !!categoryId && enabled,
+    staleTime: 0, // always fresh when the dialog opens
+  })
+}
+
 /** One expense for the edit form. `id` undefined (new expense) disables the query. */
 export const useGetExpenseQuery = (id: string | undefined) => {
   const uid = useUid()

@@ -37,8 +37,9 @@ describe('every route renders its page', () => {
     ['/expenses/new', 'Add expense'],
     ['/expenses/abc123', 'Edit expense abc123'],
     ['/categories', 'Categories'],
-    ['/categories/new', 'New category'],
-    ['/categories/food', 'Edit category food'],
+    // desktop: the same page with the side panel open (mobile shows the full-screen editor)
+    ['/categories/new', 'Categories'],
+    ['/categories/food', 'Categories'],
     ['/settings', 'Settings'],
     ['/dev/ui', 'UI style guide'],
     ['/does-not-exist', 'Page not found'],

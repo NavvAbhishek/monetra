@@ -3,7 +3,8 @@ import { cva } from 'class-variance-authority'
 /**
  * track = desktop period tabs (D1): lavender track, white active pill.
  * pill  = mobile period tabs (M1) and toolbar Week/Month/Year (D2): dark active pill.
- * chips = emoji groups (M5, D4): small chips, white inactive, dark active.
+ * chips = emoji groups on a grey panel (D4): small chips, white inactive, dark active.
+ * chips-muted = same on a white card (M5): grey inactive chips.
  */
 export const segmentedRootVariants = cva('inline-flex items-center', {
   variants: {
@@ -11,6 +12,7 @@ export const segmentedRootVariants = cva('inline-flex items-center', {
       track: 'gap-0 rounded-icon bg-track p-1',
       pill: 'gap-1.5',
       chips: 'flex-wrap gap-1.5',
+      'chips-muted': 'flex-wrap gap-1.5',
     },
     fullWidth: { true: 'flex w-full justify-between', false: '' },
   },
@@ -27,6 +29,8 @@ export const segmentedItemVariants = cva(
         pill: 'h-9 rounded-control px-3 text-base text-muted-foreground hover:text-ink data-[state=on]:bg-ink data-[state=on]:text-primary-foreground',
         chips:
           'h-6.5 rounded-tag bg-card px-2.5 text-xs text-ink hover:bg-muted data-[state=on]:bg-ink data-[state=on]:text-primary-foreground',
+        'chips-muted':
+          'h-7.5 rounded-chip bg-bg px-2.75 text-xs text-ink hover:bg-muted data-[state=on]:bg-ink data-[state=on]:text-primary-foreground',
       },
       size: {
         sm: 'text-sm',

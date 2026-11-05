@@ -10,7 +10,8 @@ const emojiBoxVariants = cva('inline-grid shrink-0 place-items-center select-non
       sm: 'size-8 rounded-chip text-emoji-sm', // 32px — table rows
       md: 'size-10.5 rounded-icon text-emoji-md', // 42px — lists
       lg: 'size-12 rounded-panel text-emoji-lg', // 48px
-      xl: 'size-19 rounded-table text-emoji-xl', // 76px — category editor header
+      xl: 'size-19 rounded-table text-emoji-xl', // 76px — category editor panel header
+      '2xl': 'size-26 rounded-sheet text-emoji-3xl', // 104px — mobile category editor
     },
   },
   defaultVariants: { size: 'md' },

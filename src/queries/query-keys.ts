@@ -13,6 +13,8 @@ export const QUERY_KEYS = {
   expenses: (range: DateRange) =>
     ['expenses', { start: range.start.toISOString(), end: range.end.toISOString() }] as const,
   expense: (id: string) => ['expenses', 'detail', id] as const,
+  /** Number of expenses using a category (delete dialog). */
+  expenseCount: (categoryId: string) => ['expenses', 'count', categoryId] as const,
 }
 
 type RangeKey = readonly ['expenses', { start: string; end: string }]

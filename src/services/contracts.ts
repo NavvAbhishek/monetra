@@ -52,6 +52,8 @@ export interface ExpensesService {
   expense_create(uid: string, input: ExpenseInput): Promise<Expense>
   expense_update(uid: string, id: string, input: ExpenseInput): Promise<Expense>
   expense_delete(uid: string, id: string): Promise<void>
+  /** How many expenses use this category (all time). Cheap: Firestore can count without reading documents. */
+  expense_countForCategory(uid: string, categoryId: string): Promise<number>
   /** Moves every expense from one category to another. Returns how many were moved. */
   expense_reassignCategory(uid: string, fromCategoryId: string, toCategoryId: string): Promise<number>
 }

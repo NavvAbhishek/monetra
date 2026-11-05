@@ -256,3 +256,14 @@ function resetDbCacheOnly() {
   resetDb()
   localStorage.setItem('monetra-mock-db', raw)
 }
+
+describe('expense_countForCategory', () => {
+  it('counts every expense of one category, all time', async () => {
+    await signInDemo()
+    const [food, groceries] = await categories.category_list(DEMO_UID)
+    const all = await expenses.expense_listInRange(DEMO_UID, { start: new Date(2000, 0, 1), end: new Date(2100, 0, 1) })
+    expect(await expenses.expense_countForCategory(DEMO_UID, food.id)).toBe(all.filter((e) => e.categoryId === food.id).length)
+    expect(await expenses.expense_countForCategory(DEMO_UID, groceries.id)).toBeGreaterThan(0)
+    expect(await expenses.expense_countForCategory(DEMO_UID, 'nope')).toBe(0)
+  })
+})
