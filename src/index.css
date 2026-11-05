@@ -1,0 +1,114 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ------------------------------------------------------------------
+   Monetra design tokens — values from design/Expense Tracker.dc.html
+   (CLAUDE.md §6). Use the Tailwind utilities (bg-primary, text-ink…)
+   rather than raw hex values in components.
+------------------------------------------------------------------- */
+:root {
+  /* Brand */
+  --ink: #1d1638;
+  --primary: #6c4df5;
+  --primary-hover: #4f33d1;
+  --primary-soft: #ede8ff;
+  --muted: #f1eef9; /* subtle background (shadcn semantics) */
+  --muted-foreground: #6b6585; /* secondary text */
+  --muted-2: #a9a3c2; /* inactive icons, future dates */
+  --text-soft: #4a4466;
+  --bg: #f4f1fb;
+  --line: #e4dff3;
+  --bar: #d9d1f7;
+  --bar-empty: #eeeaf9;
+  --success: #2e8a50;
+  --danger: #d6453a;
+
+  /* Category colours (soft background / strong text) — colourIndex 0–5 */
+  --cat-0-soft: #ffe1d6;
+  --cat-0-strong: #d4562a;
+  --cat-1-soft: #dff5e1;
+  --cat-1-strong: #2e8a50;
+  --cat-2-soft: #e3e9ff;
+  --cat-2-strong: #4c6cf0;
+  --cat-3-soft: #fff1c9;
+  --cat-3-strong: #a87a0e;
+  --cat-4-soft: #f5dfff;
+  --cat-4-strong: #9640cf;
+  --cat-5-soft: #d9f3f5;
+  --cat-5-strong: #1a8794;
+
+  /* shadcn/ui semantic variables mapped to the brand */
+  --radius: 0.75rem;
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink);
+  --primary-foreground: #ffffff;
+  --secondary: var(--primary-soft);
+  --secondary-foreground: var(--ink);
+  --accent: var(--primary-soft);
+  --accent-foreground: var(--ink);
+  --destructive: var(--danger);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--primary);
+}
+
+@theme inline {
+  --font-sans: "Bricolage Grotesque", system-ui, sans-serif;
+
+  --color-ink: var(--ink);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-text-soft: var(--text-soft);
+  --color-bg: var(--bg);
+  --color-line: var(--line);
+  --color-bar: var(--bar);
+  --color-bar-empty: var(--bar-empty);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-fab: 0 10px 20px rgba(108, 77, 245, 0.35);
+  --shadow-modal: 0 30px 80px rgba(29, 22, 56, 0.35);
+  --shadow-panel: 0 0 0 1px rgba(29, 22, 56, 0.1), 0 20px 50px rgba(29, 22, 56, 0.15);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html,
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+  button {
+    cursor: pointer;
+  }
+}
