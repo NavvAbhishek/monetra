@@ -45,3 +45,36 @@ export const buildBarHeights = (values: readonly number[]): number[] => {
   const max = Math.max(...values, 0)
   return values.map((v) => (v > 0 && max > 0 ? Math.max(6, (v / max) * 100) : 4))
 }
+
+// ---------------------------- Donut chart ----------------------------
+
+export const DONUT_SIZE = 120
+export const DONUT_RADIUS = 46
+export const DONUT_STROKE = 16
+const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS
+/** Space between slices, in circumference units. */
+const DONUT_GAP = 2.5
+
+export type DonutArc = {
+  /** `stroke-dasharray` — the visible part of the slice, then the gap to the rest of the ring. */
+  dashArray: string
+  /** `stroke-dashoffset` — where the slice starts. */
+  dashOffset: number
+}
+
+/**
+ * Ring slices for `values`, drawn as dashed strokes of one circle (start at 12 o'clock when the SVG is rotated -90°).
+ * A lone slice is a full ring; zero / negative values and an all-zero total produce no visible slice.
+ */
+export const buildDonutArcs = (values: readonly number[]): DonutArc[] => {
+  const total = values.reduce((sum, v) => sum + Math.max(v, 0), 0)
+  const gap = values.filter((v) => v > 0).length > 1 ? DONUT_GAP : 0
+  let covered = 0
+  return values.map((v) => {
+    const length = total > 0 && v > 0 ? (v / total) * DONUT_CIRCUMFERENCE : 0
+    const visible = Math.max(length - gap, length > 0 ? 0.5 : 0)
+    const arc = { dashArray: `${visible} ${DONUT_CIRCUMFERENCE - visible}`, dashOffset: -(covered + gap / 2) }
+    covered += length
+    return arc
+  })
+}

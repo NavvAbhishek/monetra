@@ -18,7 +18,7 @@ import {
   getPreviousPeriod,
   getRangeDays,
 } from '@/utils/period'
-import { describeSeries, getFirstName, RECENT_COUNT } from '../helpers/DashboardHelpers'
+import { buildInsights, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
 
 /** Everything the dashboard shows for the selected period (kept in ui.store, so it survives a reload). */
 export const useDashboard = () => {
@@ -110,7 +110,7 @@ export const useDashboard = () => {
     // lists
     categoryTotals,
     maxCategoryCents: categoryTotals[0]?.cents ?? 0,
-    recent: expenses.slice(0, RECENT_COUNT),
+    insights: buildInsights(expenses, range, now),
     categoryById,
     // state
     isLoading: currentQuery.isPending || categoriesQuery.isPending,

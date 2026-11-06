@@ -1,49 +1,102 @@
+import { useState } from 'react'
+import DonutChart from '@/components/charts/DonutChart'
 import { Amount } from '@/components/ui/amount'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmojiBox } from '@/components/ui/emoji-box'
 import { Progress } from '@/components/ui/progress'
+import { toneStroke } from '@/components/ui/tone'
+import { cn } from '@/lib/utils'
 import { Link } from '@/router/navigation'
+import { formatMoney } from '@/utils/money'
 import type { DashboardCtx } from '../hooks/useDashboard'
 
-/** Desktop: every category with spending, a bar relative to the biggest, and its share (D1). */
-const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: string }) => (
-  <Card className={className}>
-    <CardHeader className="pb-1.5">
-      <CardTitle>Categories</CardTitle>
-      <Link to="/categories" className="text-sm font-semibold text-primary hover:text-primary-hover">
-        Manage
-      </Link>
-    </CardHeader>
-    {ctx.categoryTotals.length === 0 ? (
-      <div className="m-auto flex flex-col items-center gap-3 text-center">
-        <p className="text-sm text-muted-foreground">No spending in this period yet.</p>
-        <Button asChild size="sm">
-          <Link to="/expenses/new">+ Add expense</Link>
-        </Button>
-      </div>
-    ) : (
-      <ul className="-mr-2 flex flex-col overflow-y-auto pr-2">
-        {ctx.categoryTotals.map(({ category, cents, percent }) => (
-          <li key={category.id} className="flex items-center gap-3 py-1.5">
-            <EmojiBox emoji={category.emoji} tone={category.colourIndex} size="sm" />
-            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <div className="flex justify-between gap-2 text-base">
-                <span className="truncate font-semibold text-ink">{category.name}</span>
-                <Amount cents={cents} currency={ctx.currency} />
+/**
+ * Desktop "Categories" card (D1): a donut of the period's spending next to a list with a bar, amount and share
+ * per category. Hover a slice or a row and the matching one is highlighted; the ring's centre shows its details.
+ */
+const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: string }) => {
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const rows = ctx.categoryTotals
+  const active = rows.find((r) => r.category.id === activeId)
+
+  return (
+    <Card className={className}>
+      <CardHeader className="pb-1.5">
+        <CardTitle>Categories</CardTitle>
+        <Link to="/categories" className="text-sm font-semibold text-primary hover:text-primary-hover">
+          Manage
+        </Link>
+      </CardHeader>
+
+      {rows.length === 0 ? (
+        <div className="m-auto flex flex-col items-center gap-3 text-center">
+          <p className="text-sm text-muted-foreground">No spending in this period yet.</p>
+          <Button asChild size="sm">
+            <Link to="/expenses/new">+ Add expense</Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-1 items-center gap-5">
+          <DonutChart
+            className="size-36 shrink-0"
+            slices={rows.map((r) => ({ key: r.category.id, value: r.cents, strokeClass: toneStroke(r.category.colourIndex) }))}
+            activeKey={activeId}
+            onActiveChange={setActiveId}
+            ariaLabel={`Spending by category: ${rows.map((r) => `${r.category.name} ${r.percent}%`).join(', ')}`}
+          >
+            {active ? (
+              <div className="flex min-w-0 flex-col items-center">
+                <span className="text-lg" aria-hidden>
+                  {active.category.emoji}
+                </span>
+                <span className="max-w-full truncate text-xs font-semibold text-ink">{active.category.name}</span>
+                <span className="text-sm font-extrabold text-ink">{formatMoney(active.cents, ctx.currency, { compact: true })}</span>
+                <span className="text-2xs text-muted-foreground">{active.percent}%</span>
               </div>
-              <Progress
-                value={ctx.maxCategoryCents > 0 ? (cents / ctx.maxCategoryCents) * 100 : 0}
-                tone={category.colourIndex}
-                label={`${category.name}: ${percent}% of spending`}
-              />
-            </div>
-            <span className="w-8.5 text-right text-xs text-muted-foreground">{percent}%</span>
-          </li>
-        ))}
-      </ul>
-    )}
-  </Card>
-)
+            ) : (
+              <div className="flex flex-col items-center">
+                <span className="text-2xs text-muted-foreground">Total</span>
+                <span className="text-md font-extrabold text-ink">{formatMoney(ctx.totalCents, ctx.currency, { compact: true })}</span>
+                <span className="text-2xs text-muted-foreground">
+                  {rows.length} {rows.length === 1 ? 'category' : 'categories'}
+                </span>
+              </div>
+            )}
+          </DonutChart>
+
+          <ul className="-mr-2 flex min-w-0 flex-1 flex-col pr-2">
+            {rows.map(({ category, cents, percent }) => (
+              <li
+                key={category.id}
+                onMouseEnter={() => setActiveId(category.id)}
+                onMouseLeave={() => setActiveId(null)}
+                className={cn(
+                  '-mx-2 flex items-center gap-3 rounded-control px-2 py-1.5 transition-colors',
+                  activeId === category.id && 'bg-bg',
+                  activeId && activeId !== category.id && 'opacity-60',
+                )}
+              >
+                <EmojiBox emoji={category.emoji} tone={category.colourIndex} size="sm" />
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                  <div className="flex justify-between gap-2 text-base">
+                    <span className="truncate font-semibold text-ink">{category.name}</span>
+                    <Amount cents={cents} currency={ctx.currency} />
+                  </div>
+                  <Progress
+                    value={ctx.maxCategoryCents > 0 ? (cents / ctx.maxCategoryCents) * 100 : 0}
+                    tone={category.colourIndex}
+                    label={`${category.name}: ${percent}% of spending`}
+                  />
+                </div>
+                <span className="w-8.5 text-right text-xs text-muted-foreground">{percent}%</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </Card>
+  )
+}
 
 export default CategoryBreakdown

@@ -8,7 +8,7 @@ import CategoryTiles from './components/CategoryTiles'
 import DashboardPeriodTabs from './components/DashboardPeriodTabs'
 import DashboardSkeleton from './components/DashboardSkeleton'
 import RangePicker from './components/RangePicker'
-import RecentExpenses from './components/RecentExpenses'
+import Insights from './components/Insights'
 import SpendingBreakdown from './components/SpendingBreakdown'
 import SpentCard from './components/SpentCard'
 import { useDashboard } from './hooks/useDashboard'
@@ -46,12 +46,12 @@ const Dashboard = () => {
   ) : (
     <>
       <div className="grid grid-cols-5 gap-5">
-        <SpentCard ctx={ctx} className="col-span-3 h-85" />
-        <CategoryBreakdown ctx={ctx} className="col-span-2 h-85" />
+        <SpentCard ctx={ctx} className="col-span-3 min-h-85" />
+        <CategoryBreakdown ctx={ctx} className="col-span-2 min-h-85" />
       </div>
       <div className="grid grid-cols-2 gap-5">
         <SpendingBreakdown ctx={ctx} className="h-72" />
-        <RecentExpenses ctx={ctx} />
+        <Insights ctx={ctx} />
       </div>
     </>
   )

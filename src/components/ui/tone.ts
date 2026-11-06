@@ -28,6 +28,16 @@ export const toneText = (tone: Tone): string => {
   return 'text-muted-foreground'
 }
 
+/** Stroke colour for SVG rings (donut chart): the strong category colour. */
+export const toneStroke = (tone: Tone): string => {
+  if (typeof tone === 'number') return getCategoryColour(tone).strongStroke
+  if (tone === 'ink') return 'stroke-ink'
+  if (tone === 'success') return 'stroke-success'
+  if (tone === 'danger') return 'stroke-danger'
+  if (tone === 'primary') return 'stroke-primary'
+  return 'stroke-muted-2'
+}
+
 /** Solid fill for bars and meters: the strong category colour, or the named colour. */
 export const toneFill = (tone: Tone): string => {
   if (typeof tone === 'number') return getCategoryColour(tone).strongBg

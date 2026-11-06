@@ -12,17 +12,19 @@ export type CategoryColour = {
   strongText: string
   /** Strong fill (category breakdown bars). */
   strongBg: string
+  /** Strong stroke (donut chart slices). */
+  strongStroke: string
   /** Swatch for the colour picker. */
   swatch: string
 }
 
 export const CATEGORY_COLOURS: readonly CategoryColour[] = [
-  { name: 'Peach', softBg: 'bg-cat-0-soft', strongText: 'text-cat-0-strong', strongBg: 'bg-cat-0-strong', swatch: 'bg-cat-0-soft' },
-  { name: 'Mint', softBg: 'bg-cat-1-soft', strongText: 'text-cat-1-strong', strongBg: 'bg-cat-1-strong', swatch: 'bg-cat-1-soft' },
-  { name: 'Blue', softBg: 'bg-cat-2-soft', strongText: 'text-cat-2-strong', strongBg: 'bg-cat-2-strong', swatch: 'bg-cat-2-soft' },
-  { name: 'Butter', softBg: 'bg-cat-3-soft', strongText: 'text-cat-3-strong', strongBg: 'bg-cat-3-strong', swatch: 'bg-cat-3-soft' },
-  { name: 'Lilac', softBg: 'bg-cat-4-soft', strongText: 'text-cat-4-strong', strongBg: 'bg-cat-4-strong', swatch: 'bg-cat-4-soft' },
-  { name: 'Aqua', softBg: 'bg-cat-5-soft', strongText: 'text-cat-5-strong', strongBg: 'bg-cat-5-strong', swatch: 'bg-cat-5-soft' },
+  { name: 'Peach', softBg: 'bg-cat-0-soft', strongText: 'text-cat-0-strong', strongBg: 'bg-cat-0-strong', strongStroke: 'stroke-cat-0-strong', swatch: 'bg-cat-0-soft' },
+  { name: 'Mint', softBg: 'bg-cat-1-soft', strongText: 'text-cat-1-strong', strongBg: 'bg-cat-1-strong', strongStroke: 'stroke-cat-1-strong', swatch: 'bg-cat-1-soft' },
+  { name: 'Blue', softBg: 'bg-cat-2-soft', strongText: 'text-cat-2-strong', strongBg: 'bg-cat-2-strong', strongStroke: 'stroke-cat-2-strong', swatch: 'bg-cat-2-soft' },
+  { name: 'Butter', softBg: 'bg-cat-3-soft', strongText: 'text-cat-3-strong', strongBg: 'bg-cat-3-strong', strongStroke: 'stroke-cat-3-strong', swatch: 'bg-cat-3-soft' },
+  { name: 'Lilac', softBg: 'bg-cat-4-soft', strongText: 'text-cat-4-strong', strongBg: 'bg-cat-4-strong', strongStroke: 'stroke-cat-4-strong', swatch: 'bg-cat-4-soft' },
+  { name: 'Aqua', softBg: 'bg-cat-5-soft', strongText: 'text-cat-5-strong', strongBg: 'bg-cat-5-strong', strongStroke: 'stroke-cat-5-strong', swatch: 'bg-cat-5-soft' },
 ]
 
 export const CATEGORY_COLOUR_COUNT = CATEGORY_COLOURS.length
