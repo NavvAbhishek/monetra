@@ -1,0 +1,78 @@
+name: Deploy to Firebase Hosting
+
+# Every push to `main` is checked, built and published to https://monetra-e2f97.web.app
+# Only HOSTING is deployed. Firestore rules are deployed by hand (firebase deploy --only firestore:rules).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # also lets you press "Run workflow" on GitHub to re-deploy without a new commit
+
+# Never two deploys at once; a newer push waits for the running one to finish.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # Vite 8 needs Node 20.19+ or 22.12+
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      # If either fails, the deploy stops and the live site stays as it is.
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      # A missing secret would publish a broken site (blank screen), so stop here with a clear message instead.
+      - name: Check the Firebase secrets exist
+        run: |
+          missing=0
+          for name in VITE_FIREBASE_API_KEY VITE_FIREBASE_AUTH_DOMAIN VITE_FIREBASE_PROJECT_ID VITE_FIREBASE_STORAGE_BUCKET VITE_FIREBASE_MESSAGING_SENDER_ID VITE_FIREBASE_APP_ID; do
+            if [ -z "${!name}" ]; then echo "::error::GitHub secret $name is missing (Settings > Secrets and variables > Actions)"; missing=1; fi
+          done
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then echo "::error::GitHub secret FIREBASE_SERVICE_ACCOUNT_MONETRA_E2F97 is missing"; missing=1; fi
+          exit $missing
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MONETRA_E2F97 }}
+
+      - name: Build
+        run: npm run build
+        env:
+          # Real backend (the .env.local file is not in git, so the values come from GitHub Secrets)
+          VITE_DATA_SOURCE: firebase
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      - name: Deploy to Firebase Hosting (live)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          # created by `firebase init hosting:github` (least-privilege: Hosting only)
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MONETRA_E2F97 }}
+          projectId: monetra-e2f97
+          channelId: live
