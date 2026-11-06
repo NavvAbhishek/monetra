@@ -252,6 +252,15 @@
   }
 }
 
+/* Sideways-scrolling rows: a thin scrollbar for mouse users (so it's obvious they scroll), hidden on touch screens. */
+@utility scrollbar-thin-mouse {
+  scrollbar-width: none;
+  @media (hover: hover) and (pointer: fine) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+}
+
 /* Respect "reduce motion": no slide / zoom / fade animations, instant transitions. */
 @media (prefers-reduced-motion: reduce) {
   *,

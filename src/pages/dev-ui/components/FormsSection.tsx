@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import * as Icon from '@/components/icons'
+import DatePicker from '@/components/DatePicker'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FormField } from '@/components/ui/form-field'
 import { fieldMessageId } from '@/components/ui/form-field-ids'
@@ -23,6 +24,7 @@ const FormsSection = () => {
   const [period, setPeriod] = useState<PeriodOption>('week')
   const [group, setGroup] = useState<EmojiGroupOption>('all')
   const [keep, setKeep] = useState(true)
+  const [date, setDate] = useState('2026-11-26')
 
   return (
     <Section title="Forms" description="input · password-input · textarea · select · checkbox · label · form-field · segmented-tabs">
@@ -84,6 +86,15 @@ const FormsSection = () => {
               <SelectItem value="groceries">🛒 Groceries</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+      </Row>
+
+      <Row label="DatePicker (replaces the browser's date input)">
+        <div className="w-64">
+          <DatePicker value={date} onChange={setDate} />
+        </div>
+        <div className="w-64 rounded-panel bg-bg p-2">
+          <DatePicker variant="filled" size="md" value={date} onChange={setDate} max="2026-12-31" />
         </div>
       </Row>
 

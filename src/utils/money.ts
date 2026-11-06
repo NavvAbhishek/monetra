@@ -21,6 +21,7 @@ export const getCurrencyDigits = (currency: string = DEFAULT_CURRENCY): number =
  */
 export const toCents = (input: string | number, currency: string = DEFAULT_CURRENCY): number | null => {
   const digits = getCurrencyDigits(currency)
+  if (typeof input === 'string' && input.includes('+')) return null // sums go through sumAmountExpression, never a silent "500100"
   const raw = typeof input === 'number' ? String(input) : input.replace(/[^\d.-]/g, '')
   if (raw === '' || raw === '-' || raw === '.') return null
   if (!/^-?\d*\.?\d*$/.test(raw)) return null

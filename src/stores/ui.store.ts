@@ -12,10 +12,13 @@ interface UIState {
   lastCategoryId: string | null
   /** App colour picked in Settings (saved on this device). */
   themeColor: ThemeColorId
+  /** Desktop sidebar shrunk to an icon strip (saved on this device). */
+  sidebarCollapsed: boolean
   setPeriod: (period: PeriodKey) => void
   setCustomRange: (range: IsoDateRange | null) => void
   setLastCategoryId: (id: string | null) => void
   setThemeColor: (id: ThemeColorId) => void
+  toggleSidebar: () => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -25,10 +28,12 @@ export const useUIStore = create<UIState>()(
       customRange: null,
       lastCategoryId: null,
       themeColor: DEFAULT_THEME_COLOR,
+      sidebarCollapsed: false,
       setPeriod: (period) => set({ period }),
       setCustomRange: (customRange) => set({ customRange }),
       setLastCategoryId: (lastCategoryId) => set({ lastCategoryId }),
       setThemeColor: (themeColor) => set({ themeColor }),
+      toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
     }),
     { name: 'monetra-ui', version: 1 },
   ),

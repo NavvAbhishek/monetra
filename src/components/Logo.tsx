@@ -16,17 +16,25 @@ const markVariants = cva('grid shrink-0 place-items-center font-extrabold', {
   defaultVariants: { tone: 'primary', size: 'md' },
 })
 
-export type LogoProps = VariantProps<typeof markVariants> & { className?: string }
+export type LogoProps = VariantProps<typeof markVariants> & {
+  className?: string
+  /** Only the "$" mark (collapsed sidebar). */
+  markOnly?: boolean
+}
 
 /** Brand mark ("$" square) + app name. */
-const Logo = ({ tone, size, className }: LogoProps) => (
+const Logo = ({ tone, size, className, markOnly = false }: LogoProps) => (
   <div className={cn('flex items-center gap-2.5', className)}>
     <span className={markVariants({ tone, size })} aria-hidden>
       $
     </span>
-    <span className={cn('text-2xl font-extrabold tracking-tight', tone === 'inverse' ? 'text-primary-foreground' : 'text-ink')}>
-      {APP_NAME}
-    </span>
+    {markOnly ? (
+      <span className="sr-only">{APP_NAME}</span>
+    ) : (
+      <span className={cn('text-2xl font-extrabold tracking-tight', tone === 'inverse' ? 'text-primary-foreground' : 'text-ink')}>
+        {APP_NAME}
+      </span>
+    )}
   </div>
 )
 

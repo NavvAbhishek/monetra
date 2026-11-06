@@ -5,11 +5,15 @@ import { cn } from '@/lib/utils'
 import { getDayState, getMonthGrid, WEEKDAY_INITIALS } from '../helpers/DateRangePickerHelpers'
 import type { DateRangePickerCtx } from '../hooks/useDateRangePicker'
 
+/** What the calendar needs — the range picker's state, or a single-date picker's (draft.start = draft.end). */
+export type CalendarCtx = Pick<DateRangePickerCtx, 'month' | 'draft' | 'today' | 'selectDay' | 'previousMonth' | 'nextMonth' | 'canGoNext'>
+
 /**
  * One month of days (Sunday first). The picked range shows as a soft strip; its two ends
- * are solid purple; future days are disabled (M6, D1).
+ * are solid purple (M6, D1). Days after `maxDate` are disabled — by default, every day after today.
+ * Also the calendar of the single-date `DatePicker`.
  */
-const CalendarMonth = ({ ctx, size }: { ctx: DateRangePickerCtx; size: 'sm' | 'md' }) => {
+const CalendarMonth = ({ ctx, size, maxDate }: { ctx: CalendarCtx; size: 'sm' | 'md'; maxDate?: Date }) => {
   const { month, draft, today, selectDay } = ctx
   const cells = getMonthGrid(month)
   const big = size === 'md'
@@ -37,6 +41,7 @@ const CalendarMonth = ({ ctx, size }: { ctx: DateRangePickerCtx; size: 'sm' | 'm
         {cells.map((day, i) => {
           if (!day) return <span key={`empty-${i}`} aria-hidden />
           const s = getDayState(day, draft, today)
+          const disabled = maxDate ? day > maxDate : s.isFuture
           const isEdge = s.isStart || s.isEnd
           const hasStrip = !!draft.end && !(s.isStart && s.isEnd) && (s.isBetween || isEdge)
           return (
@@ -52,7 +57,7 @@ const CalendarMonth = ({ ctx, size }: { ctx: DateRangePickerCtx; size: 'sm' | 'm
             >
               <button
                 type="button"
-                disabled={s.isFuture}
+                disabled={disabled}
                 aria-pressed={isEdge}
                 aria-label={format(day, 'EEEE, MMMM d, yyyy')}
                 aria-current={s.isToday ? 'date' : undefined}
@@ -62,7 +67,7 @@ const CalendarMonth = ({ ctx, size }: { ctx: DateRangePickerCtx; size: 'sm' | 'm
                   big ? 'size-9 rounded-control text-base' : 'size-8 rounded-chip text-sm',
                   isEdge
                     ? 'bg-primary font-bold text-primary-foreground'
-                    : s.isFuture
+                    : disabled
                       ? 'font-medium text-muted-2'
                       : 'font-medium text-ink hover:bg-muted',
                   s.isToday && !isEdge && 'underline underline-offset-4',

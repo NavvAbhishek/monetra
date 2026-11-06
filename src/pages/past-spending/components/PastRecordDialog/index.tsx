@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { Controller } from 'react-hook-form'
+import DatePicker from '@/components/DatePicker'
 import { AmountInput } from '@/components/ExpenseForm/components/AmountInput'
 import * as Icon from '@/components/icons'
 import { Button } from '@/components/ui/button'
@@ -36,6 +37,7 @@ const PastRecordDialog = ({ record, categories, currency, firstTrackedAt, onClos
   const { errors } = formState
   const periodType = watch('periodType')
   const years = getYearOptions(now)
+  const todayIso = format(now, 'yyyy-MM-dd')
 
   const yearSelect = (
     <Controller
@@ -146,10 +148,22 @@ const PastRecordDialog = ({ record, categories, currency, firstTrackedAt, onClos
             {periodType === 'range' && (
               <div className="grid grid-cols-2 gap-2.5">
                 <FormField id="past-from" label="From" labelVariant="muted" error={errors.rangeStart?.message}>
-                  <Input id="past-from" type="date" variant="filled" size="md" max={format(now, 'yyyy-MM-dd')} {...fieldErrorProps('past-from', errors.rangeStart?.message)} {...register('rangeStart')} />
+                  <Controller
+                    control={control}
+                    name="rangeStart"
+                    render={({ field }) => (
+                      <DatePicker id="past-from" variant="filled" size="md" max={todayIso} value={field.value} onChange={field.onChange} invalid={!!errors.rangeStart} />
+                    )}
+                  />
                 </FormField>
                 <FormField id="past-to" label="To" labelVariant="muted" error={errors.rangeEnd?.message}>
-                  <Input id="past-to" type="date" variant="filled" size="md" {...fieldErrorProps('past-to', errors.rangeEnd?.message)} {...register('rangeEnd')} />
+                  <Controller
+                    control={control}
+                    name="rangeEnd"
+                    render={({ field }) => (
+                      <DatePicker id="past-to" variant="filled" size="md" max={todayIso} value={field.value} onChange={field.onChange} invalid={!!errors.rangeEnd} />
+                    )}
+                  />
                 </FormField>
               </div>
             )}

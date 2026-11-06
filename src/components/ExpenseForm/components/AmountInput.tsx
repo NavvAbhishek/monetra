@@ -15,7 +15,9 @@ export type AmountInputProps = Omit<ComponentProps<'input'>, 'size' | 'type'> & 
 export const AmountInput = ({ symbol, size, invalid, text, className, ...props }: AmountInputProps) => (
   <div
     className={cn(
-      'flex min-w-0 items-baseline justify-end gap-0.5 font-extrabold tracking-tight text-ink',
+      'flex min-w-0 items-baseline justify-end font-extrabold tracking-tight text-ink',
+      // "$" sits right against the number; longer symbols ("Rs", "A$", "S$") need a little room
+      symbol.length > 1 ? 'gap-2' : 'gap-0.5',
       size === 'dialog' ? 'text-hero' : 'text-5xl',
     )}
   >
