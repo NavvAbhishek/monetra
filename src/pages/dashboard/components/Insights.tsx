@@ -82,7 +82,9 @@ const Insights = ({ ctx, className }: { ctx: DashboardCtx; className?: string })
           <h2 id="dash-insights" className="text-xl font-bold text-ink">
             Insights
           </h2>
-          <span className="text-sm text-muted-foreground">{ctx.subtitle}</span>
+          <Link to="/insights" className="text-sm font-semibold text-primary hover:text-primary-hover">
+            See all
+          </Link>
         </div>
         {stats}
       </section>
@@ -91,9 +93,14 @@ const Insights = ({ ctx, className }: { ctx: DashboardCtx; className?: string })
 
   return (
     <Card className={className}>
-      <div className="flex flex-col gap-0.5">
-        <CardTitle>Insights</CardTitle>
-        <CardDescription>{ctx.subtitle}</CardDescription>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <CardTitle>Insights</CardTitle>
+          <CardDescription>{ctx.subtitle}</CardDescription>
+        </div>
+        <Link to="/insights" className="pt-1 text-sm font-semibold text-primary hover:text-primary-hover">
+          See all
+        </Link>
       </div>
       {stats}
     </Card>

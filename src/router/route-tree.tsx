@@ -97,6 +97,12 @@ const categoryEditRoute = createRoute({
   component: lazyRouteComponent(() => import('@/pages/categories')),
 })
 
+const insightsRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/insights',
+  component: lazyRouteComponent(() => import('@/pages/insights')),
+})
+
 const pastSpendingRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/past-spending',
@@ -134,6 +140,7 @@ export const routeTree = rootRoute.addChildren([
     categoriesRoute,
     categoryNewRoute,
     categoryEditRoute,
+    insightsRoute,
     settingsRoute,
     pastSpendingRoute,
   ]),

@@ -1,8 +1,11 @@
 // Single re-export of every lucide icon the app uses.
 // Import as: import * as Icon from "@/components/icons"
 export {
+  ArrowDown,
   ArrowLeft,
+  ArrowUp,
   Calendar,
+  ChartColumn,
   ChartPie,
   Check,
   ChevronDown,

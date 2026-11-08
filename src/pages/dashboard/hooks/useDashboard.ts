@@ -6,6 +6,7 @@ import { useGetProfileQuery } from '@/queries/profile/profile-queries'
 import { useAuthStore } from '@/stores/auth.store'
 import { useUIStore } from '@/stores/ui.store'
 import type { IsoDateRange, PeriodKey } from '@/types/period'
+import { assignChartTones } from '@/utils/chart-tones'
 import { compareTotals, sumCents, totalsByCategory } from '@/utils/aggregate'
 import { DEFAULT_CURRENCY } from '@/utils/money'
 import {
@@ -18,7 +19,7 @@ import {
   getPreviousPeriod,
   getRangeDays,
 } from '@/utils/period'
-import { assignChartTones, buildInsights, buildStackedBars, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
+import { buildInsights, buildStackedBars, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
 
 /** Everything the dashboard shows for the selected period (kept in ui.store, so it survives a reload). */
 export const useDashboard = () => {
