@@ -26,7 +26,7 @@ const ProfileForm = ({ profile, photoURL }: { profile: Profile; photoURL?: strin
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
         <FormField id="settings-name" label="Name" error={errors.name?.message}>
           <Input id="settings-name" size="md" autoComplete="name" {...fieldErrorProps('settings-name', errors.name?.message)} {...register('name')} />
         </FormField>

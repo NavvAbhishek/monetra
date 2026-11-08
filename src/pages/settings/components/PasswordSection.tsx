@@ -23,7 +23,7 @@ const ChangePasswordForm = () => {
         />
       </FormField>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
         <FormField id="new-password" label="New password" error={errors.newPassword?.message}>
           <PasswordInput
             id="new-password"
@@ -55,17 +55,10 @@ const ChangePasswordForm = () => {
   )
 }
 
-/** Change the login password. Google-only accounts have no Monetra password, so they just get an explanation. */
-const PasswordSection = ({ hasPassword }: { hasPassword: boolean }) => (
-  <SettingsSection
-    title="Password"
-    description={hasPassword ? 'Enter your current password, then choose a new one.' : undefined}
-  >
-    {hasPassword ? (
-      <ChangePasswordForm />
-    ) : (
-      <p className="text-base text-muted-foreground">You log in with Google, so there’s no Monetra password to change. Manage it in your Google account.</p>
-    )}
+/** Change the login password. Google-only accounts have no Monetra password, so the page doesn't render this card for them. */
+const PasswordSection = () => (
+  <SettingsSection title="Password" description="Enter your current password, then choose a new one.">
+    <ChangePasswordForm />
   </SettingsSection>
 )
 

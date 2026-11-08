@@ -9,7 +9,7 @@ const ThemeColorPicker = ({ value, onChange }: { value: ThemeColorId; onChange: 
     aria-label="Theme colour"
     value={value}
     onValueChange={(v) => onChange(v as ThemeColorId)}
-    className="grid grid-cols-4 gap-x-2 gap-y-4 sm:grid-cols-6 lg:grid-cols-11"
+    className="grid grid-cols-4 gap-x-2 gap-y-4 sm:grid-cols-6"
   >
     {THEME_COLORS.map((theme, i) => (
       <RadioGroup.Item

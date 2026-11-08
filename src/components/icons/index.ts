@@ -9,6 +9,7 @@ export {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
+  ChevronsUpDown,
   ChevronsRight,
   ChevronUp,
   Download,

@@ -1,13 +1,12 @@
 import Logo from '@/components/Logo'
 import * as Icon from '@/components/icons'
 import NavItem from '@/components/partials/NavItem'
-import { Avatar } from '@/components/ui/avatar'
+import ProfileMenu from '@/components/partials/ProfileMenu'
 import { Button } from '@/components/ui/button'
 import { IconButton } from '@/components/ui/icon-button'
-import { NAV_LINKS, SETTINGS_LINK } from '@/constant/navLinksData'
+import { NAV_LINKS } from '@/constant/navLinksData'
 import { cn } from '@/lib/utils'
 import { Link } from '@/router/navigation'
-import { useAuthStore } from '@/stores/auth.store'
 import { useUIStore } from '@/stores/ui.store'
 
 /**
@@ -15,7 +14,6 @@ import { useUIStore } from '@/stores/ui.store'
  * remembered on this device). Hidden below `lg` — phones use the bottom tab bar.
  */
 const Sidebar = ({ className }: { className?: string }) => {
-  const user = useAuthStore((s) => s.user)
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
@@ -57,7 +55,7 @@ const Sidebar = ({ className }: { className?: string }) => {
         ))}
       </nav>
 
-      {/* bottom: collapse / expand, then the profile → Settings */}
+      {/* bottom: collapse / expand, then the profile menu (Settings / Log out) */}
       <div className="mt-auto flex flex-col gap-1.5">
         <Button
           variant="secondary"
@@ -72,24 +70,7 @@ const Sidebar = ({ className }: { className?: string }) => {
           {!collapsed && <span className="font-semibold">Collapse</span>}
         </Button>
 
-        <Link
-          to={SETTINGS_LINK.to}
-          aria-label={`Settings for ${user?.name ?? 'your account'}`}
-          title={collapsed ? `${user?.name ?? 'Account'} · Settings` : undefined}
-          className={cn(
-            'flex items-center rounded-control border-t border-muted py-2.5 outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring',
-            collapsed ? 'justify-center' : 'gap-2.5 px-2',
-          )}
-          activeProps={{ className: 'bg-primary-soft' }}
-        >
-          <Avatar name={user?.name ?? '?'} src={user?.photoURL} />
-          {!collapsed && (
-            <span className="flex min-w-0 flex-col">
-              <span className="truncate text-base font-semibold text-ink">{user?.name ?? 'Account'}</span>
-              <span className="text-xs text-muted-foreground">Settings</span>
-            </span>
-          )}
-        </Link>
+        <ProfileMenu collapsed={collapsed} />
       </div>
     </aside>
   )
