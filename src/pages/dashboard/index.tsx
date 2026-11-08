@@ -48,10 +48,8 @@ const Dashboard = () => {
   ) : (
     <>
       <SpentCard ctx={ctx} className="min-h-85" />
-      <div className="grid grid-cols-5 gap-5">
-        <CategoryBreakdown ctx={ctx} className="col-span-3" />
-        <Insights ctx={ctx} className="col-span-2" />
-      </div>
+      <CategoryBreakdown ctx={ctx} />
+      <Insights ctx={ctx} />
       <SpendingBreakdown ctx={ctx} className="min-h-72" />
       <AllTimeCard />
     </>

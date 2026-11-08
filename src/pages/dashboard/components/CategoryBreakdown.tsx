@@ -13,7 +13,7 @@ import type { DashboardCtx } from '../hooks/useDashboard'
 
 /**
  * "Categories" card (D1, and mobile M1 under the hero): a donut of the period's spending next to a list with a bar, amount and share
- * per category (beside the donut on desktop, below it on phones). Hover (desktop) or tap (phone) a slice or a row and the matching one is highlighted; the ring's centre shows its details.
+ * per category (beside a large donut on desktop, below it on phones). Hover (desktop) or tap (phone) a slice or a row and the matching one is highlighted; the ring's centre shows its details.
  */
 const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: string }) => {
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -37,9 +37,9 @@ const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: 
           </Button>
         </div>
       ) : (
-        <div className={cn('flex flex-1 gap-5', ctx.isMobile ? 'flex-col items-stretch pt-2' : 'items-center')}>
+        <div className={cn('flex flex-1', ctx.isMobile ? 'flex-col items-stretch gap-5 pt-2' : 'items-center gap-12')}>
           <DonutChart
-            className={cn('shrink-0', ctx.isMobile ? 'mx-auto size-44' : 'size-48')}
+            className={cn('shrink-0', ctx.isMobile ? 'mx-auto size-44' : 'size-96')}
             slices={rows.map((r) => ({ key: r.category.id, value: r.cents, strokeClass: toneStroke(r.tone) }))}
             activeKey={activeId}
             onActiveChange={setActiveId}
@@ -47,18 +47,18 @@ const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: 
           >
             {active ? (
               <div className="flex min-w-0 flex-col items-center">
-                <span className="text-lg" aria-hidden>
+                <span className={ctx.isMobile ? 'text-lg' : 'text-emoji-lg'} aria-hidden>
                   {active.category.emoji}
                 </span>
-                <span className="max-w-full truncate text-xs font-semibold text-ink">{active.category.name}</span>
-                <span className="text-sm font-extrabold text-ink">{formatMoney(active.cents, ctx.currency, { compact: true })}</span>
-                <span className="text-2xs text-muted-foreground">{active.percent}%</span>
+                <span className={cn('max-w-full truncate font-semibold text-ink', ctx.isMobile ? 'text-xs' : 'text-base')}>{active.category.name}</span>
+                <span className={cn('font-extrabold text-ink', ctx.isMobile ? 'text-sm' : 'text-2xl')}>{formatMoney(active.cents, ctx.currency, { compact: true })}</span>
+                <span className={cn('text-muted-foreground', ctx.isMobile ? 'text-2xs' : 'text-sm')}>{active.percent}%</span>
               </div>
             ) : (
               <div className="flex flex-col items-center">
-                <span className="text-2xs text-muted-foreground">Total</span>
-                <span className="text-md font-extrabold text-ink">{formatMoney(ctx.totalCents, ctx.currency, { compact: true })}</span>
-                <span className="text-2xs text-muted-foreground">
+                <span className={cn('text-muted-foreground', ctx.isMobile ? 'text-2xs' : 'text-sm')}>Total</span>
+                <span className={cn('font-extrabold text-ink', ctx.isMobile ? 'text-md' : 'text-3xl')}>{formatMoney(ctx.totalCents, ctx.currency, { compact: true })}</span>
+                <span className={cn('text-muted-foreground', ctx.isMobile ? 'text-2xs' : 'text-sm')}>
                   {rows.length} {rows.length === 1 ? 'category' : 'categories'}
                 </span>
               </div>

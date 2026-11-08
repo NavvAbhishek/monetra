@@ -15,10 +15,8 @@ const DashboardSkeleton = ({ compact }: { compact: boolean }) =>
   ) : (
     <div role="status" aria-label="Loading dashboard" className="flex flex-col gap-5">
       <Skeleton className="h-85 rounded-card" />
-      <div className="grid grid-cols-5 gap-5">
-        <Skeleton className="col-span-3 h-85 rounded-card" />
-        <Skeleton className="col-span-2 h-85 rounded-card" />
-      </div>
+      <Skeleton className="h-85 rounded-card" />
+      <Skeleton className="h-60 rounded-card" />
       <Skeleton className="h-72 rounded-card" />
     </div>
   )

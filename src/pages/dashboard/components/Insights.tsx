@@ -46,7 +46,7 @@ const Insights = ({ ctx, className }: { ctx: DashboardCtx; className?: string })
     ctx.totalCents === 0 ? (
       <p className="m-auto py-6 text-sm text-muted-foreground">Insights appear once there are expenses in this period.</p>
     ) : (
-      <dl className={cn('grid grid-cols-2', mobile ? 'gap-2.5' : 'flex-1 gap-3 pt-3')}>
+      <dl className={cn('grid', mobile ? 'grid-cols-2 gap-2.5' : cn('flex-1 gap-3 pt-3', insights.days >= LONG_PERIOD_DAYS ? 'grid-cols-3 2xl:grid-cols-6' : 'grid-cols-4'))}>
         <Stat
           mobile={mobile}
           label="Daily average"
