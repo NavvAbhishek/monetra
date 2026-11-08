@@ -15,6 +15,7 @@ const InsightsToolbar = ({ ctx }: { ctx: InsightsCtx }) => (
       onValueChange={ctx.setPeriod}
       options={INSIGHTS_PERIOD_OPTIONS}
     />
+    {!ctx.isAll && (
     <div className="flex items-center gap-1" role="group" aria-label="Period">
       <IconButton variant="surface" size="md" aria-label="Previous period" onClick={ctx.goPrevious}>
         <Icon.ChevronLeft aria-hidden />
@@ -27,6 +28,7 @@ const InsightsToolbar = ({ ctx }: { ctx: InsightsCtx }) => (
         <Icon.ChevronRight aria-hidden />
       </IconButton>
     </div>
+    )}
   </>
 )
 

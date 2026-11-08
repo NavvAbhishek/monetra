@@ -39,7 +39,7 @@ const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: 
       ) : (
         <div className={cn('flex flex-1 gap-5', ctx.isMobile ? 'flex-col items-stretch pt-2' : 'items-center')}>
           <DonutChart
-            className={cn('shrink-0', ctx.isMobile ? 'mx-auto size-44' : 'size-36')}
+            className={cn('shrink-0', ctx.isMobile ? 'mx-auto size-44' : 'size-48')}
             slices={rows.map((r) => ({ key: r.category.id, value: r.cents, strokeClass: toneStroke(r.tone) }))}
             activeKey={activeId}
             onActiveChange={setActiveId}

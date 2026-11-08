@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { usePastItems } from '@/hooks/use-past-items'
 import { useGetCategoriesQuery } from '@/queries/categories/categories-queries'
 import { useGetExpensesQuery } from '@/queries/expenses/expenses-queries'
 import { useGetProfileQuery } from '@/queries/profile/profile-queries'
@@ -7,10 +8,13 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useUIStore } from '@/stores/ui.store'
 import type { IsoDateRange, PeriodKey } from '@/types/period'
 import { assignChartTones } from '@/utils/chart-tones'
+import { buildStackedBars } from '@/utils/stacked-bars'
 import { compareTotals, sumCents, totalsByCategory } from '@/utils/aggregate'
 import { DEFAULT_CURRENCY } from '@/utils/money'
+import { UNSPLIT_CATEGORY } from '@/utils/pastSpending'
 import {
   bucketTotals,
+  getBucketTitle,
   dateRangeToIso,
   getBucketProgress,
   getChartBuckets,
@@ -19,7 +23,7 @@ import {
   getPreviousPeriod,
   getRangeDays,
 } from '@/utils/period'
-import { buildInsights, buildStackedBars, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
+import { buildInsights, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
 
 /** Everything the dashboard shows for the selected period (kept in ui.store, so it survives a reload). */
 export const useDashboard = () => {
@@ -43,8 +47,14 @@ export const useDashboard = () => {
   const profileQuery = useGetProfileQuery()
 
   const currency = profileQuery.data?.currency ?? DEFAULT_CURRENCY
-  const expenses = useMemo(() => currentQuery.data ?? [], [currentQuery.data])
-  const categoryById = useMemo(() => new Map((categoriesQuery.data ?? []).map((c) => [c.id, c])), [categoriesQuery.data])
+  // past spending that falls in the period is added to the tracked expenses (spread evenly over each record's days)
+  const pastNow = usePastItems(range)
+  const pastBefore = usePastItems(previous.range)
+  const expenses = useMemo(() => [...(currentQuery.data ?? []), ...pastNow.items], [currentQuery.data, pastNow.items])
+  const categoryById = useMemo(
+    () => new Map([...(categoriesQuery.data ?? []), UNSPLIT_CATEGORY].map((c) => [c.id, c])),
+    [categoriesQuery.data],
+  )
 
   // ---- chart ----
   // One set of buckets for both charts: the Month tab uses every day, Week Mon…Sun, Year months, Day 3-hour blocks.
@@ -59,7 +69,7 @@ export const useDashboard = () => {
   const totalCents = sumCents(expenses)
   const comparison = compareTotals({
     currentCents: totalCents,
-    previousCents: sumCents(previousQuery.data ?? []),
+    previousCents: sumCents(previousQuery.data ?? []) + sumCents(pastBefore.items),
     period,
     previous,
     rangeDays: getRangeDays(range),
@@ -77,7 +87,14 @@ export const useDashboard = () => {
 
   // stacking order = categories by spending, biggest at the bottom (same order as the donut)
   const stackedBars = useMemo(
-    () => buildStackedBars(period, chartBuckets, expenses, categoryTotals.map((t) => t.category), new Map(categoryTotals.map((t) => [t.category.id, t.tone]))),
+    () =>
+      buildStackedBars(
+        chartBuckets,
+        expenses,
+        categoryTotals.map((t) => t.category),
+        new Map(categoryTotals.map((t) => [t.category.id, t.tone])),
+        (bucket) => getBucketTitle(period, bucket),
+      ),
     [period, chartBuckets, expenses, categoryTotals],
   )
 
@@ -124,7 +141,9 @@ export const useDashboard = () => {
     insights: buildInsights(expenses, range, now),
     categoryById,
     // state
-    isLoading: currentQuery.isPending || categoriesQuery.isPending,
+    includesPast: pastNow.items.length > 0,
+    pastIsEstimate: pastNow.hasEstimates,
+    isLoading: currentQuery.isPending || categoriesQuery.isPending || pastNow.isLoading,
     isError: currentQuery.isError || categoriesQuery.isError,
     retry: () => {
       void currentQuery.refetch()

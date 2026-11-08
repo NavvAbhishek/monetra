@@ -5,7 +5,7 @@ import type { PastRecordsService } from '../contracts'
 import { ServiceError } from '../errors'
 import { pastRecordFromDoc } from './converters'
 import { guard } from './errors'
-import { categoryRef, pastRecordRef, pastRecordsCol } from './paths'
+import { categoriesCol, categoryRef, pastRecordRef, pastRecordsCol } from './paths'
 
 const BATCH_LIMIT = 450
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/
@@ -47,6 +47,28 @@ export const pastRecordsFirebase: PastRecordsService = {
     const now = Timestamp.now()
     await setDoc(ref, { ...toData(input), createdAt: now, updatedAt: now })
     return pastRecordFromDoc(await getDoc(ref))
+  }),
+
+  /** CSV import: one category read for all rows, then batched writes (each batch is all-or-nothing). */
+  pastRecord_createMany: guard(async (uid, inputs) => {
+    const categoryIds = new Set((await getDocs(categoriesCol(uid))).docs.map((d) => d.id))
+    for (const input of inputs) {
+      if (!Number.isInteger(input.amountCents) || input.amountCents <= 0 || !ISO_DAY.test(input.start) || !ISO_DAY.test(input.end) || input.start > input.end) {
+        throw new ServiceError('pastRecord/invalid', 'Some rows have an invalid amount or period.')
+      }
+      if (input.categoryId && !categoryIds.has(input.categoryId)) {
+        throw new ServiceError('category/not-found', 'A category in the file no longer exists.')
+      }
+    }
+    const now = Timestamp.now()
+    for (let i = 0; i < inputs.length; i += BATCH_LIMIT) {
+      const batch = writeBatch(getDb())
+      inputs.slice(i, i + BATCH_LIMIT).forEach((input) => {
+        batch.set(doc(pastRecordsCol(uid)), { ...toData(input), createdAt: now, updatedAt: now })
+      })
+      await batch.commit()
+    }
+    return inputs.length
   }),
 
   pastRecord_update: guard(async (uid, id, input) => {

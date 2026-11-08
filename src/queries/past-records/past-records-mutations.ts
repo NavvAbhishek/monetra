@@ -22,6 +22,19 @@ export const useCreatePastRecordMutation = () => {
   })
 }
 
+/** CSV import: saves all the confirmed rows. */
+export const useImportPastRecordsMutation = () => {
+  const refresh = useRefresh()
+  return useMutation({
+    mutationFn: (inputs: readonly PastRecordInput[]) => API.pastRecords.pastRecord_createMany(requireUid(), inputs),
+    onSuccess: (count) => {
+      void refresh()
+      Notification.success(`Imported ${count} ${count === 1 ? 'record' : 'records'}`)
+    },
+    onError: (error) => Notification.error(errorMessage(error)),
+  })
+}
+
 export const useUpdatePastRecordMutation = () => {
   const refresh = useRefresh()
   return useMutation({

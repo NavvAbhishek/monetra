@@ -225,6 +225,25 @@ export const getChartBuckets = (period: PeriodKey, range: DateRange): Bucket[] =
   })
 }
 
+/**
+ * Buckets for an "all time" range: one per month while the history is up to 3 years long, one per year beyond that.
+ * `range.start` should be the first day of tracked / past spending, `range.end` tomorrow.
+ */
+export const getAllTimeBuckets = (range: DateRange): { buckets: Bucket[]; unit: 'month' | 'year' } => {
+  const first = startOfMonth(range.start)
+  const last = addDays(range.end, -1)
+  const months = (last.getFullYear() - first.getFullYear()) * 12 + last.getMonth() - first.getMonth() + 1
+  const unit = months > 36 ? 'year' : 'month'
+  const count = unit === 'year' ? last.getFullYear() - first.getFullYear() + 1 : months
+  const buckets = Array.from({ length: count }, (_, i) => {
+    const start = unit === 'year' ? new Date(first.getFullYear() + i, 0, 1) : addMonths(first, i)
+    const end = unit === 'year' ? new Date(start.getFullYear() + 1, 0, 1) : addMonths(start, 1)
+    const label = unit === 'year' ? format(start, 'yyyy') : format(start, count > 12 ? 'MMM yy' : 'MMM')
+    return { label, start, end }
+  })
+  return { buckets, unit }
+}
+
 /** Full name of a chart bucket for tooltips: "Sat, Nov 7", "Nov 23 – 29", "November 2026", "9 AM – 12 PM". */
 export const getBucketTitle = (period: PeriodKey, bucket: Bucket): string => {
   switch (period) {

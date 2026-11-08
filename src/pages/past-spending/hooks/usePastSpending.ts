@@ -21,6 +21,7 @@ export const usePastSpending = () => {
   const allTime = useMemo(() => buildAllTime(records, totalsQuery.data, categories), [records, totalsQuery.data, categories])
 
   const [dialog, setDialog] = useState<DialogState>({ kind: 'closed' })
+  const [importOpen, setImportOpen] = useState(false)
   const [toDelete, setToDelete] = useState<PastRecord | null>(null)
 
   return {
@@ -32,6 +33,7 @@ export const usePastSpending = () => {
     firstTrackedAt: totalsQuery.data?.firstSpentAt ?? null,
     isLoading: recordsQuery.isPending || totalsQuery.isPending || categoriesQuery.isPending,
     isError: recordsQuery.isError || totalsQuery.isError || categoriesQuery.isError,
+    error: recordsQuery.error ?? totalsQuery.error ?? categoriesQuery.error,
     retry: () => {
       void recordsQuery.refetch()
       void totalsQuery.refetch()
@@ -42,6 +44,10 @@ export const usePastSpending = () => {
     openNew: () => setDialog({ kind: 'new' }),
     openEdit: (record: PastRecord) => setDialog({ kind: 'edit', record }),
     closeDialog: () => setDialog({ kind: 'closed' }),
+    // CSV import
+    importOpen,
+    openImport: () => setImportOpen(true),
+    closeImport: () => setImportOpen(false),
     // delete confirm
     toDelete,
     askDelete: setToDelete,

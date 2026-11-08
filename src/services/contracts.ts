@@ -78,6 +78,8 @@ export interface PastRecordsService {
   /** Newest period first. */
   pastRecord_list(uid: string): Promise<PastRecord[]>
   pastRecord_create(uid: string, input: PastRecordInput): Promise<PastRecord>
+  /** CSV import: saves many records at once. Returns how many were saved. */
+  pastRecord_createMany(uid: string, inputs: readonly PastRecordInput[]): Promise<number>
   pastRecord_update(uid: string, id: string, input: PastRecordInput): Promise<PastRecord>
   pastRecord_delete(uid: string, id: string): Promise<void>
   /** When a category is deleted: move its past records to another category, or to null ("All categories"). */

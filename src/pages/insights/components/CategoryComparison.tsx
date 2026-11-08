@@ -3,6 +3,7 @@ import { Card, CardDescription, CardTitle } from '@/components/ui/card'
 import { EmojiBox } from '@/components/ui/emoji-box'
 import { Progress } from '@/components/ui/progress'
 import { formatMoney } from '@/utils/money'
+import { monthlyAverageCents } from '@/utils/spending-stats'
 import type { InsightsCtx } from '../hooks/useInsights'
 import DeltaChip from './DeltaChip'
 
@@ -13,8 +14,12 @@ const CategoryComparison = ({ ctx, className }: { ctx: InsightsCtx; className?: 
 
   return (
     <Card className={className}>
-      <CardTitle>Categories vs {ctx.previousName}</CardTitle>
-      <CardDescription>Red means you spent more, green means less{ctx.previousPartial ? ' (same days of the previous period)' : ''}.</CardDescription>
+      <CardTitle>{ctx.isAll ? 'Categories' : `Categories vs ${ctx.previousName}`}</CardTitle>
+      <CardDescription>
+        {ctx.isAll
+          ? 'Where all your spending went.'
+          : `Red means you spent more, green means less${ctx.previousPartial ? ' (same days of the previous period)' : ''}.`}
+      </CardDescription>
       {rows.length === 0 ? (
         <p className="m-auto py-8 text-sm text-muted-foreground">No spending to compare yet.</p>
       ) : (
@@ -27,12 +32,16 @@ const CategoryComparison = ({ ctx, className }: { ctx: InsightsCtx; className?: 
                   <span className="truncate font-semibold text-ink">{category.name}</span>
                   <span className="flex items-baseline gap-2">
                     <Amount cents={currentCents} currency={ctx.currency} />
-                    <DeltaChip delta={delta} className="w-16 justify-end" />
+                    {!ctx.isAll && <DeltaChip delta={delta} className="w-16 justify-end" />}
                   </span>
                 </div>
                 <Progress value={max > 0 ? (currentCents / max) * 100 : 0} tone={tone} label={`${category.name}: ${formatMoney(currentCents, ctx.currency)}`} />
                 <p className="text-xs text-muted-foreground">
-                  {previousCents > 0 ? `Before: ${formatMoney(previousCents, ctx.currency)}` : 'Nothing in the previous period'}
+                  {ctx.isAll
+                    ? `${formatMoney(monthlyAverageCents(currentCents, ctx.summary.days), ctx.currency)} per month on average`
+                    : previousCents > 0
+                      ? `Before: ${formatMoney(previousCents, ctx.currency)}`
+                      : 'Nothing in the previous period'}
                 </p>
               </div>
             </li>

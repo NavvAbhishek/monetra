@@ -1,5 +1,7 @@
-import { format } from 'date-fns'
+import { addDays, differenceInCalendarDays, format } from 'date-fns'
 import type { Category } from '@/types/category'
+import type { Expense } from '@/types/expense'
+import type { DateRange } from '@/types/period'
 import type { ExpenseTotals, PastRecord } from '@/types/pastRecord'
 import { formatRangeLabel, parseIsoDate, toIsoDate } from './period'
 
@@ -74,4 +76,69 @@ export const buildAllTime = (
       .map((r) => ({ ...r, percent: allTimeCents > 0 ? Math.round((r.totalCents / allTimeCents) * 100) : 0 }))
       .sort((a, b) => b.totalCents - a.totalCents),
   }
+}
+
+// ---------------------------- past spending inside the dashboard / Insights numbers --------------------------
+
+const PAST_ID_PREFIX = 'past:'
+
+/** Past records without a category (an old app's total) show up as this stand-in category. */
+export const UNSPLIT_CATEGORY: Category = {
+  id: '__unsplit',
+  name: 'Not split by category',
+  emoji: '🧾',
+  colourIndex: 5,
+  order: 9999,
+  createdAt: new Date(0),
+}
+
+/** Is this item a piece of a past record (not a real tracked expense)? */
+export const isPastItem = (e: Pick<Expense, 'id'>): boolean => e.id.startsWith(PAST_ID_PREFIX)
+
+export type PastItems = {
+  items: Expense[]
+  /** Some record is longer than a day, so its amount was spread evenly over its days (an estimate for shorter views). */
+  hasEstimates: boolean
+}
+
+/**
+ * Turns the part of each past record that falls inside `range` into one pseudo-expense per day, so the dashboard and
+ * Insights can add it to the tracked expenses. A record's amount is spread evenly over ALL its days (the remainder cents go
+ * to the first days), so a daily record lands exactly on its day, a month record adds roughly a thirtieth per day, and any
+ * selected range gets only its share. The items are noon on their day, with ids starting `past:` (see `isPastItem`).
+ */
+export const pastRecordsToExpenses = (records: readonly PastRecord[], range: DateRange): PastItems => {
+  const items: Expense[] = []
+  let hasEstimates = false
+  const rangeFirst = range.start
+  const rangeLast = addDays(range.end, -1)
+
+  for (const record of records) {
+    const first = parseIsoDate(record.start)
+    const last = parseIsoDate(record.end)
+    const from = first > rangeFirst ? first : rangeFirst
+    const to = last < rangeLast ? last : rangeLast
+    if (from > to) continue
+
+    const days = differenceInCalendarDays(last, first) + 1
+    const base = Math.floor(record.amountCents / days)
+    const remainder = record.amountCents - base * days
+    if (days > 1) hasEstimates = true
+
+    for (let day = from; day <= to; day = addDays(day, 1)) {
+      const offset = differenceInCalendarDays(day, first)
+      const amountCents = base + (offset < remainder ? 1 : 0)
+      if (amountCents <= 0) continue
+      items.push({
+        id: `${PAST_ID_PREFIX}${record.id}:${toIsoDate(day)}`,
+        amountCents,
+        categoryId: record.categoryId ?? UNSPLIT_CATEGORY.id,
+        spentAt: new Date(day.getFullYear(), day.getMonth(), day.getDate(), 12),
+        note: record.note,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt,
+      })
+    }
+  }
+  return { items, hasEstimates }
 }

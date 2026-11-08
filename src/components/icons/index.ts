@@ -8,6 +8,7 @@ export {
   ChartColumn,
   ChartPie,
   Check,
+  CircleCheck,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -17,6 +18,7 @@ export {
   ChevronUp,
   Download,
   Eye,
+  FileSpreadsheet,
   EyeOff,
   History,
   House,
@@ -31,5 +33,6 @@ export {
   Settings,
   Trash2,
   TriangleAlert,
+  Upload,
   X,
 } from 'lucide-react'

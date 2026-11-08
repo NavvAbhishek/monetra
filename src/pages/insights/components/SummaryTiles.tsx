@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import type { ReactNode } from 'react'
 import { Amount } from '@/components/ui/amount'
 import { Link } from '@/router/navigation'
@@ -35,7 +36,7 @@ const SummaryTiles = ({ ctx }: { ctx: InsightsCtx }) => {
   const { summary, currency, categoryById } = ctx
   const { biggest, highestDay } = summary
   const biggestCategory = biggest ? categoryById.get(biggest.categoryId) : undefined
-  const compare = ctx.totalDelta.direction === 'none' ? null : (
+  const compare = ctx.isAll ? ctx.periodLabel : ctx.totalDelta.direction === 'none' ? null : (
     <span className="flex items-center gap-1.5">
       <DeltaChip delta={ctx.totalDelta} />
       <span>vs {ctx.previousName}{ctx.previousPartial ? ' (same days)' : ''}</span>
@@ -43,7 +44,7 @@ const SummaryTiles = ({ ctx }: { ctx: InsightsCtx }) => {
   )
 
   return (
-    <dl className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+    <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <Tile label="Total spent" hint={compare ?? 'Nothing to compare yet'}>
         <Amount cents={summary.totalCents} currency={currency} size="md" />
       </Tile>
@@ -66,6 +67,29 @@ const SummaryTiles = ({ ctx }: { ctx: InsightsCtx }) => {
       <Tile label="No-spend days" hint={summary.days > 0 ? `of ${summary.days} so far` : 'Period not started'}>
         {summary.noSpendDays}
       </Tile>
+      {ctx.period !== 'week' && (
+        <Tile label="Monthly average" hint="per month, on average">
+          <Amount cents={summary.monthlyAverageCents} currency={currency} size="md" />
+        </Tile>
+      )}
+      {(ctx.period === 'year' || ctx.isAll) && summary.highestMonth && (
+        <Tile label="Highest month" hint={format(summary.highestMonth.monthStart, 'MMMM yyyy')}>
+          <Amount cents={summary.highestMonth.cents} currency={currency} size="md" />
+        </Tile>
+      )}
+      {summary.streak && summary.streak.days >= 3 && (
+        <Tile
+          label="Longest no-spend streak"
+          hint={`${format(summary.streak.from, 'MMM d')} – ${format(summary.streak.to, 'MMM d, yyyy')}`}
+        >
+          {summary.streak.days} days
+        </Tile>
+      )}
+      {ctx.projectedCents !== null && (
+        <Tile label={`On track for this ${ctx.period}`} hint="if you keep this pace">
+          <Amount cents={ctx.projectedCents} currency={currency} size="md" />
+        </Tile>
+      )}
     </dl>
   )
 }

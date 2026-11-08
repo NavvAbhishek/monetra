@@ -74,7 +74,7 @@ const PastRecordDialog = ({ record, categories, currency, firstTrackedAt, onClos
       >
         <DialogHeader
           title={record ? 'Edit past spending' : 'Add past spending'}
-          description="Money you spent before Monetra. It's kept out of your dashboard."
+          description="Money you spent before Monetra."
         />
 
         <form id={FORM_ID} onSubmit={onSubmit} noValidate className="flex flex-col gap-4">

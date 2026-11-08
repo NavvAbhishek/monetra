@@ -1,3 +1,4 @@
+import AllTimeCard from '@/components/AllTimeCard'
 import * as Icon from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -42,17 +43,17 @@ const Dashboard = () => {
       <SpentCard ctx={ctx} />
       <CategoryBreakdown ctx={ctx} />
       <Insights ctx={ctx} />
+      <AllTimeCard />
     </>
   ) : (
     <>
+      <SpentCard ctx={ctx} className="min-h-85" />
       <div className="grid grid-cols-5 gap-5">
-        <SpentCard ctx={ctx} className="col-span-3 min-h-85" />
-        <CategoryBreakdown ctx={ctx} className="col-span-2 min-h-85" />
+        <CategoryBreakdown ctx={ctx} className="col-span-3" />
+        <Insights ctx={ctx} className="col-span-2" />
       </div>
-      <div className="grid grid-cols-2 gap-5">
-        <SpendingBreakdown ctx={ctx} className="min-h-72" />
-        <Insights ctx={ctx} />
-      </div>
+      <SpendingBreakdown ctx={ctx} className="min-h-72" />
+      <AllTimeCard />
     </>
   )
 

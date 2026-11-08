@@ -7,7 +7,7 @@ import SettingsSection from './SettingsSection'
 const PastSpendingSection = () => (
   <SettingsSection
     title="Past spending"
-    description="Moved from another app? Add what you spent before Monetra and see your all-time total. It never appears on your dashboard."
+    description="Moved from another app? Add what you spent before Monetra and see your all-time total."
   >
     <div>
       <Button asChild variant="outline" size="md">

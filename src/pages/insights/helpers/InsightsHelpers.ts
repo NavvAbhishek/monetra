@@ -4,14 +4,17 @@ import type { Category } from '@/types/category'
 import type { Expense } from '@/types/expense'
 import type { DateRange, PeriodKey } from '@/types/period'
 import { groupByDay, sumCents, totalsByCategory } from '@/utils/aggregate'
+import { isPastItem } from '@/utils/pastSpending'
+import { highestMonth, longestNoSpendStreak, monthlyAverageCents, type Streak } from '@/utils/spending-stats'
 
-/** Insights offers Week / Month / Year with ‹ › stepping (same as the Expenses page). */
-export type InsightsPeriod = Extract<PeriodKey, 'week' | 'month' | 'year'>
+/** Insights offers Week / Month / Year with ‹ › stepping (like the Expenses page), and "All time" (everything since the first record). */
+export type InsightsPeriod = Extract<PeriodKey, 'week' | 'month' | 'year'> | 'all'
 
 export const INSIGHTS_PERIOD_OPTIONS: readonly SegmentedOption<InsightsPeriod>[] = [
   { value: 'week', label: 'Week' },
   { value: 'month', label: 'Month' },
   { value: 'year', label: 'Year' },
+  { value: 'all', label: 'All time' },
 ]
 
 // ---------------------------- change vs the previous period --------------------------
@@ -43,6 +46,10 @@ export type Summary = {
   activeDays: number
   /** Days so far with no spending at all. */
   noSpendDays: number
+  monthlyAverageCents: number
+  highestMonth: { monthStart: Date; cents: number } | null
+  /** Longest run of days without spending. */
+  streak: Streak | null
 }
 
 /** Last day that counts: the end of the period, or today while it is still running. */
@@ -51,19 +58,24 @@ const lastCountedDay = (range: DateRange, now: Date): Date =>
 
 export const buildSummary = (expenses: readonly Expense[], range: DateRange, now: Date): Summary => {
   const days = Math.max(0, differenceInCalendarDays(lastCountedDay(range, now), range.start) + 1)
+  // totals / days use everything (tracked + past spending); "biggest" and the count are about real expenses only
+  const real = expenses.filter((e) => !isPastItem(e))
   const byDay = groupByDay(expenses)
   const totalCents = sumCents(expenses)
   const highest = byDay.reduce<(typeof byDay)[number] | null>((best, g) => (!best || g.totalCents > best.totalCents ? g : best), null)
-  const biggest = expenses.reduce<Expense | null>((best, e) => (!best || e.amountCents > best.amountCents ? e : best), null)
+  const biggest = real.reduce<Expense | null>((best, e) => (!best || e.amountCents > best.amountCents ? e : best), null)
   return {
     totalCents,
-    count: expenses.length,
+    count: real.length,
     days,
     dailyAverageCents: days > 0 ? Math.round(totalCents / days) : 0,
     highestDay: highest ? { date: highest.date, cents: highest.totalCents } : null,
     biggest,
-    activeDays: byDay.length,
+    activeDays: groupByDay(real).length,
     noSpendDays: Math.max(0, days - byDay.length),
+    monthlyAverageCents: monthlyAverageCents(totalCents, days),
+    highestMonth: highestMonth(expenses),
+    streak: longestNoSpendStreak(expenses, range, now),
   }
 }
 
@@ -132,6 +144,37 @@ export const getTopExpenses = (expenses: readonly Expense[], limit = 5): Expense
 
 /** "This month" while the period contains today, otherwise its label. */
 export const getHeading = (period: InsightsPeriod, isCurrent: boolean, subtitle: string): string =>
-  isCurrent ? `This ${period}` : subtitle
+  period === 'all' ? `All time · ${subtitle}` : isCurrent ? `This ${period}` : subtitle
 
 export const formatDay = (date: Date): string => format(date, 'EEE, MMM d')
+
+// ---------------------------- by year (all time) --------------------------
+
+export type YearSummary = {
+  year: number
+  totalCents: number
+  /** Months of this year that count: the first year starts at the first record, the current year stops at this month. */
+  months: number
+  monthlyAverageCents: number
+  /** Monthly average compared with the year before (fair for a part-year); `none` for the first year. */
+  delta: Delta
+}
+
+/** One row per calendar year of the history, compared by monthly average. */
+export const buildYearSummaries = (expenses: readonly Expense[], range: DateRange, now: Date): YearSummary[] => {
+  const last = lastCountedDay(range, now)
+  const totals = new Map<number, number>()
+  for (const e of expenses) totals.set(e.spentAt.getFullYear(), (totals.get(e.spentAt.getFullYear()) ?? 0) + e.amountCents)
+
+  const rows: YearSummary[] = []
+  for (let year = range.start.getFullYear(); year <= last.getFullYear(); year++) {
+    const firstMonth = year === range.start.getFullYear() ? range.start.getMonth() : 0
+    const lastMonth = year === last.getFullYear() ? last.getMonth() : 11
+    const months = lastMonth - firstMonth + 1
+    const totalCents = totals.get(year) ?? 0
+    const average = months > 0 ? Math.round(totalCents / months) : 0
+    const previous = rows[rows.length - 1]
+    rows.push({ year, totalCents, months, monthlyAverageCents: average, delta: previous ? getDelta(average, previous.monthlyAverageCents) : { direction: 'none', percent: 0 } })
+  }
+  return rows
+}

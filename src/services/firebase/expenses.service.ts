@@ -16,6 +16,7 @@ import {
   where,
   writeBatch,
 } from 'firebase/firestore'
+import { FirebaseError } from 'firebase/app'
 import { getDb } from '@/lib/firebase'
 import type { ExpenseInput } from '@/types/expense'
 import type { ExpensesService } from '../contracts'
@@ -100,16 +101,25 @@ export const expensesFirebase: ExpensesService = {
    */
   expense_totals: guard(async (uid) => {
     const col = expensesCol(uid)
+    // A sum with a category filter needs the composite index in firestore.indexes.json (categoryId + amountCents).
+    // Until `firebase deploy --only firestore:indexes` has run (and the index has built), fall back to adding up that category's documents.
+    const categorySum = async (categoryId: string): Promise<number> => {
+      const inCategory = query(col, where('categoryId', '==', categoryId))
+      try {
+        return (await getAggregateFromServer(inCategory, { total: sum('amountCents') })).data().total ?? 0
+      } catch (error) {
+        if (!(error instanceof FirebaseError) || error.code !== 'failed-precondition') throw error
+        if (import.meta.env.DEV) console.warn('[firebase] missing index for per-category sums — run: firebase deploy --only firestore:indexes')
+        return (await getDocs(inCategory)).docs.reduce((total, d) => total + expenseFromDoc(d).amountCents, 0)
+      }
+    }
     const [overall, first, categories] = await Promise.all([
       getAggregateFromServer(col, { total: sum('amountCents'), count: count() }),
       getDocs(query(col, orderBy('spentAt', 'asc'), limit(1))),
       getDocs(categoriesCol(uid)),
     ])
     const perCategory = await Promise.all(
-      categories.docs.map(async (c) => {
-        const agg = await getAggregateFromServer(query(col, where('categoryId', '==', c.id)), { total: sum('amountCents') })
-        return [c.id, agg.data().total ?? 0] as const
-      }),
+      categories.docs.map(async (c) => [c.id, await categorySum(c.id)] as const),
     )
     const firstDoc = first.docs[0]
     return {

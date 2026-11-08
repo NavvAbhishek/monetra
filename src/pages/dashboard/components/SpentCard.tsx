@@ -22,6 +22,11 @@ const SpentCard = ({ ctx, className }: { ctx: DashboardCtx; className?: string }
       </div>
       <Amount cents={ctx.totalCents} currency={ctx.currency} size={desktop ? 'display' : 'hero'} tone="inverse" />
       <p className={desktop ? 'text-base' : 'text-xs'}>{ctx.comparison.text}</p>
+      {ctx.includesPast && (
+        <p className={desktop ? 'text-sm' : 'text-2xs'}>
+          Includes past spending{ctx.pastIsEstimate ? ' · longer records are spread evenly over their days' : ''}
+        </p>
+      )}
       <AreaLineChart
         className={desktop ? 'mt-3.5 flex-1' : 'mt-2.5 h-30'}
         values={ctx.lineValues}

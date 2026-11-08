@@ -6,6 +6,9 @@ import { cn } from '@/lib/utils'
 import { Link } from '@/router/navigation'
 import type { DashboardCtx } from '../hooks/useDashboard'
 
+/** A monthly average / highest month only make sense once the period covers more than a month. */
+const LONG_PERIOD_DAYS = 45
+
 const Stat = ({ label, value, hint, expenseId, mobile }: { label: string; value: ReactNode; hint: ReactNode; expenseId?: string; mobile?: boolean }) => (
   <div className={cn('relative flex min-w-0 flex-col gap-1 rounded-tile', mobile ? 'bg-card p-3.5' : 'bg-bg p-4', expenseId && 'hover:brightness-95')}>
     <dt className="text-sm text-muted-foreground">{label}</dt>
@@ -40,7 +43,7 @@ const Insights = ({ ctx, className }: { ctx: DashboardCtx; className?: string })
   const amountSize = mobile ? 'md' : 'lg'
 
   const stats =
-    insights.count === 0 ? (
+    ctx.totalCents === 0 ? (
       <p className="m-auto py-6 text-sm text-muted-foreground">Insights appear once there are expenses in this period.</p>
     ) : (
       <dl className={cn('grid grid-cols-2', mobile ? 'gap-2.5' : 'flex-1 gap-3 pt-3')}>
@@ -72,6 +75,23 @@ const Insights = ({ ctx, className }: { ctx: DashboardCtx; className?: string })
           value={insights.count.toLocaleString('en-US')}
           hint={`on ${insights.activeDays} ${insights.activeDays === 1 ? 'day' : 'days'}`}
         />
+        {/* long periods only: a monthly average means little for a week */}
+        {insights.days >= LONG_PERIOD_DAYS && (
+          <>
+            <Stat
+              mobile={mobile}
+              label="Monthly average"
+              value={<Amount cents={insights.monthlyAverageCents} currency={currency} size={amountSize} />}
+              hint="per month"
+            />
+            <Stat
+              mobile={mobile}
+              label="Highest month"
+              value={insights.highestMonth ? <Amount cents={insights.highestMonth.cents} currency={currency} size={amountSize} /> : '—'}
+              hint={insights.highestMonth ? format(insights.highestMonth.monthStart, 'MMMM yyyy') : ''}
+            />
+          </>
+        )}
       </dl>
     )
 

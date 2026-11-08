@@ -46,6 +46,15 @@ export const pastRecordsMock: PastRecordsService = {
     return clone(record)
   },
 
+  async pastRecord_createMany(uid, inputs) {
+    await delay()
+    inputs.forEach((input) => validate(uid, input)) // all or nothing
+    const now = new Date()
+    for (const input of inputs) listFor(uid).push({ id: newId(), ...input, note: input.note.trim(), createdAt: now, updatedAt: now })
+    saveDb()
+    return inputs.length
+  },
+
   async pastRecord_update(uid, id, input) {
     await delay()
     validate(uid, input)
