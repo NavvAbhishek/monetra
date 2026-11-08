@@ -17,6 +17,19 @@ export type LineChartGeometry = {
   last: { xPct: number; yPct: number } | null
 }
 
+/** Value → y in the viewBox (0 sits on the bottom line, `max` near the top). */
+const scaleY = (v: number, max: number): number =>
+  max > 0 ? CHART_H - BOTTOM_PAD - (v / max) * (CHART_H - BOTTOM_PAD - TOP_PAD) : CHART_H - BOTTOM_PAD
+
+export type YTick = { value: number; yPct: number }
+
+/** Left-axis ticks: the highest value, half of it, and 0 — placed with the same scale as the line. Empty when there is no spending. */
+export const buildYTicks = (values: readonly number[]): YTick[] => {
+  const max = Math.max(...values, 0)
+  if (max <= 0) return []
+  return [max, Math.round(max / 2), 0].map((value) => ({ value, yPct: (scaleY(value, max) / CHART_H) * 100 }))
+}
+
 /**
  * @param values one value per bucket (all of them, so the x-axis spacing is right)
  * @param count  how many buckets to plot (the ones that have started)
@@ -28,7 +41,7 @@ export const buildLineChart = (values: readonly number[], count: number): LineCh
 
   const max = Math.max(...values, 0)
   const step = n > 1 ? CHART_W / (n - 1) : 0
-  const y = (v: number) => (max > 0 ? CHART_H - BOTTOM_PAD - (v / max) * (CHART_H - BOTTOM_PAD - TOP_PAD) : CHART_H - BOTTOM_PAD)
+  const y = (v: number) => scaleY(v, max)
   const pts = values.slice(0, plotted).map((v, i) => [i * step, y(v)] as const)
   const f = ([x, yy]: readonly [number, number]) => `${x.toFixed(1)},${yy.toFixed(1)}`
   const lastPt = pts[pts.length - 1]
@@ -40,11 +53,24 @@ export const buildLineChart = (values: readonly number[], count: number): LineCh
   }
 }
 
-/** Bar heights in % of the tallest bar; empty buckets get a small 4% stub (as in the design). */
-export const buildBarHeights = (values: readonly number[]): number[] => {
-  const max = Math.max(...values, 0)
-  return values.map((v) => (v > 0 && max > 0 ? Math.max(6, (v / max) * 100) : 4))
+/** Above this many x-axis labels the chart shows only some of them (a month has up to 31). */
+export const MAX_FULL_LABELS = 12
+
+/**
+ * Which of `count` x-axis labels to show when there are too many to fit: the first, every 5th (5, 10, 15…),
+ * and the last one if it isn't crowding the previous label (so 31-day months end on "30", 28-day months on "28").
+ */
+export const sparseLabelIndexes = (count: number): number[] => {
+  const shown: number[] = []
+  for (let i = 0; i < count; i++) if (i === 0 || (i + 1) % 5 === 0) shown.push(i)
+  const last = count - 1
+  if (last > 0 && !shown.includes(last) && last - shown[shown.length - 1] >= 3) shown.push(last)
+  return shown
 }
+
+/** Value-axis ticks for the stacked bar chart: the tallest bar, half of it, and 0. `yPct` is measured from the top of the plot. */
+export const buildBarTicks = (max: number): YTick[] =>
+  max <= 0 ? [] : [max, Math.round(max / 2), 0].map((value) => ({ value, yPct: 100 - (value / max) * 100 }))
 
 // ---------------------------- Donut chart ----------------------------
 

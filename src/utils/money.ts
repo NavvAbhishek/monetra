@@ -66,6 +66,10 @@ export const formatMoney = (
   { compact = false }: FormatMoneyOptions = {},
 ): string => getFormatter(currency, compact).format(fromCents(cents, currency))
 
+/** Cents → short plain number for chart axes, no currency sign: 940000 → "9.4K", 1250000000 → "12.5M". */
+export const formatCompactNumber = (cents: number, currency: string = DEFAULT_CURRENCY): string =>
+  new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(fromCents(cents, currency))
+
 /** "$", "€", "Rs"… for a currency code (shown beside the amount input). */
 export const getCurrencySymbol = (currency: string = DEFAULT_CURRENCY): string => {
   try {

@@ -42,6 +42,8 @@ const DonutChart = ({ slices, activeKey, onActiveChange, children, ariaLabel, cl
               strokeDashoffset={arcs[i].dashOffset}
               onMouseEnter={() => onActiveChange?.(slice.key)}
               onMouseLeave={() => onActiveChange?.(null)}
+              // touch / pen have no hover: a tap toggles the slice (a mouse already shows it on hover)
+              onPointerUp={(e) => e.pointerType !== 'mouse' && onActiveChange?.(activeKey === slice.key ? null : slice.key)}
               className={cn('fill-none transition-opacity duration-150', slice.strokeClass, activeKey && activeKey !== slice.key && 'opacity-25')}
             />
           ) : null,

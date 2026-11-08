@@ -213,6 +213,32 @@ export const getBuckets = (period: PeriodKey, range: DateRange): Bucket[] => {
   }
 }
 
+/**
+ * Buckets for the line chart on the purple hero card. Same as `getBuckets`, except the Month tab plots one
+ * point per DAY (1…28/29/30/31 — whatever the month has) instead of weekly chunks. The bar chart keeps W1…W5.
+ */
+export const getChartBuckets = (period: PeriodKey, range: DateRange): Bucket[] => {
+  if (period !== 'month') return getBuckets(period, range)
+  return Array.from({ length: getRangeDays(range) }, (_, i) => {
+    const start = addDays(range.start, i)
+    return { label: format(start, 'd'), start, end: addDays(start, 1) }
+  })
+}
+
+/** Full name of a chart bucket for tooltips: "Sat, Nov 7", "Nov 23 – 29", "November 2026", "9 AM – 12 PM". */
+export const getBucketTitle = (period: PeriodKey, bucket: Bucket): string => {
+  switch (period) {
+    case 'day':
+      return `${format(bucket.start, 'h a')} – ${format(bucket.end, 'h a')}`
+    case 'year':
+      return format(bucket.start, 'MMMM yyyy')
+    default: {
+      const last = addDays(bucket.end, -1)
+      return isSameDay(bucket.start, last) ? format(bucket.start, 'EEE, MMM d') : formatRangeLabel(bucket.start, last)
+    }
+  }
+}
+
 /** Sums `amountCents` of the items falling in each bucket. */
 export const bucketTotals = (
   buckets: readonly Bucket[],

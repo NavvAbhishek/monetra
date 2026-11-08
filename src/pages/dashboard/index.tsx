@@ -4,7 +4,6 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { IconButton } from '@/components/ui/icon-button'
 import { PageHeader } from '@/components/ui/page-header'
 import CategoryBreakdown from './components/CategoryBreakdown'
-import CategoryTiles from './components/CategoryTiles'
 import DashboardPeriodTabs from './components/DashboardPeriodTabs'
 import DashboardSkeleton from './components/DashboardSkeleton'
 import RangePicker from './components/RangePicker'
@@ -41,7 +40,8 @@ const Dashboard = () => {
   ) : isMobile ? (
     <>
       <SpentCard ctx={ctx} />
-      <CategoryTiles ctx={ctx} />
+      <CategoryBreakdown ctx={ctx} />
+      <Insights ctx={ctx} />
     </>
   ) : (
     <>
@@ -50,7 +50,7 @@ const Dashboard = () => {
         <CategoryBreakdown ctx={ctx} className="col-span-2 min-h-85" />
       </div>
       <div className="grid grid-cols-2 gap-5">
-        <SpendingBreakdown ctx={ctx} className="h-72" />
+        <SpendingBreakdown ctx={ctx} className="min-h-72" />
         <Insights ctx={ctx} />
       </div>
     </>

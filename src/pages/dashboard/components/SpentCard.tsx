@@ -1,6 +1,7 @@
 import AreaLineChart from '@/components/charts/AreaLineChart'
 import { Amount } from '@/components/ui/amount'
 import { cn } from '@/lib/utils'
+import { formatCompactNumber } from '@/utils/money'
 import type { DashboardCtx } from '../hooks/useDashboard'
 
 /** The purple "You spent" card: total, comparison, line chart (M1, D1). */
@@ -23,10 +24,11 @@ const SpentCard = ({ ctx, className }: { ctx: DashboardCtx; className?: string }
       <p className={desktop ? 'text-base' : 'text-xs'}>{ctx.comparison.text}</p>
       <AreaLineChart
         className={desktop ? 'mt-3.5 flex-1' : 'mt-2.5 h-30'}
-        values={ctx.bucketValues}
-        labels={ctx.labels}
-        elapsedCount={ctx.elapsedCount}
+        values={ctx.lineValues}
+        labels={ctx.lineLabels}
+        elapsedCount={ctx.lineElapsedCount}
         ariaLabel={ctx.chartLabel}
+        formatValue={(cents) => formatCompactNumber(cents, ctx.currency)}
       />
     </section>
   )

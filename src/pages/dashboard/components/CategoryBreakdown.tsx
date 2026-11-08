@@ -12,8 +12,8 @@ import { formatMoney } from '@/utils/money'
 import type { DashboardCtx } from '../hooks/useDashboard'
 
 /**
- * Desktop "Categories" card (D1): a donut of the period's spending next to a list with a bar, amount and share
- * per category. Hover a slice or a row and the matching one is highlighted; the ring's centre shows its details.
+ * "Categories" card (D1, and mobile M1 under the hero): a donut of the period's spending next to a list with a bar, amount and share
+ * per category (beside the donut on desktop, below it on phones). Hover (desktop) or tap (phone) a slice or a row and the matching one is highlighted; the ring's centre shows its details.
  */
 const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: string }) => {
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -37,10 +37,10 @@ const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: 
           </Button>
         </div>
       ) : (
-        <div className="flex flex-1 items-center gap-5">
+        <div className={cn('flex flex-1 gap-5', ctx.isMobile ? 'flex-col items-stretch pt-2' : 'items-center')}>
           <DonutChart
-            className="size-36 shrink-0"
-            slices={rows.map((r) => ({ key: r.category.id, value: r.cents, strokeClass: toneStroke(r.category.colourIndex) }))}
+            className={cn('shrink-0', ctx.isMobile ? 'mx-auto size-44' : 'size-36')}
+            slices={rows.map((r) => ({ key: r.category.id, value: r.cents, strokeClass: toneStroke(r.tone) }))}
             activeKey={activeId}
             onActiveChange={setActiveId}
             ariaLabel={`Spending by category: ${rows.map((r) => `${r.category.name} ${r.percent}%`).join(', ')}`}
@@ -66,18 +66,20 @@ const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: 
           </DonutChart>
 
           <ul className="-mr-2 flex min-w-0 flex-1 flex-col pr-2">
-            {rows.map(({ category, cents, percent }) => (
+            {rows.map(({ category, cents, percent, tone }) => (
               <li
                 key={category.id}
                 onMouseEnter={() => setActiveId(category.id)}
                 onMouseLeave={() => setActiveId(null)}
+                // touch has no hover: a tap highlights the row and its slice
+                onPointerUp={(e) => e.pointerType !== 'mouse' && setActiveId(activeId === category.id ? null : category.id)}
                 className={cn(
                   '-mx-2 flex items-center gap-3 rounded-control px-2 py-1.5 transition-colors',
                   activeId === category.id && 'bg-bg',
                   activeId && activeId !== category.id && 'opacity-60',
                 )}
               >
-                <EmojiBox emoji={category.emoji} tone={category.colourIndex} size="sm" />
+                <EmojiBox emoji={category.emoji} tone={tone} size="sm" />
                 <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                   <div className="flex justify-between gap-2 text-base">
                     <span className="truncate font-semibold text-ink">{category.name}</span>
@@ -85,7 +87,7 @@ const CategoryBreakdown = ({ ctx, className }: { ctx: DashboardCtx; className?: 
                   </div>
                   <Progress
                     value={ctx.maxCategoryCents > 0 ? (cents / ctx.maxCategoryCents) * 100 : 0}
-                    tone={category.colourIndex}
+                    tone={tone}
                     label={`${category.name}: ${percent}% of spending`}
                   />
                 </div>

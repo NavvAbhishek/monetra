@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 import { Link } from '@/router/navigation'
 import type { DashboardCtx } from '../hooks/useDashboard'
 
-const Stat = ({ label, value, hint, expenseId }: { label: string; value: ReactNode; hint: ReactNode; expenseId?: string }) => (
-  <div className={cn('relative flex min-w-0 flex-col gap-1 rounded-tile bg-bg p-4', expenseId && 'hover:brightness-95')}>
+const Stat = ({ label, value, hint, expenseId, mobile }: { label: string; value: ReactNode; hint: ReactNode; expenseId?: string; mobile?: boolean }) => (
+  <div className={cn('relative flex min-w-0 flex-col gap-1 rounded-tile', mobile ? 'bg-card p-3.5' : 'bg-bg p-4', expenseId && 'hover:brightness-95')}>
     <dt className="text-sm text-muted-foreground">{label}</dt>
     <dd className="flex min-w-0 flex-col gap-0.5">
       {expenseId ? (
@@ -17,12 +17,12 @@ const Stat = ({ label, value, hint, expenseId }: { label: string; value: ReactNo
           params={{ expenseId }}
           className="flex min-w-0 flex-col gap-0.5 outline-none after:absolute after:inset-0 after:rounded-tile focus-visible:after:ring-2 focus-visible:after:ring-ring"
         >
-          <span className="truncate text-2xl font-extrabold text-ink">{value}</span>
+          <span className={cn('truncate font-extrabold text-ink', mobile ? 'text-xl' : 'text-2xl')}>{value}</span>
           <span className="truncate text-xs text-muted-foreground">{hint}</span>
         </Link>
       ) : (
         <>
-          <span className="truncate text-2xl font-extrabold text-ink">{value}</span>
+          <span className={cn('truncate font-extrabold text-ink', mobile ? 'text-xl' : 'text-2xl')}>{value}</span>
           <span className="truncate text-xs text-muted-foreground">{hint}</span>
         </>
       )}
@@ -30,11 +30,64 @@ const Stat = ({ label, value, hint, expenseId }: { label: string; value: ReactNo
   </div>
 )
 
-/** Desktop "Insights" (replaces Recent expenses): quick numbers for the selected period. */
+/** "Insights" (replaces Recent expenses): quick numbers for the selected period. A card on desktop, plain tiles under a heading on phones. */
 const Insights = ({ ctx, className }: { ctx: DashboardCtx; className?: string }) => {
   const { insights, currency, categoryById } = ctx
   const { biggest, highestDay } = insights
   const biggestCategory = biggest ? categoryById.get(biggest.categoryId) : undefined
+
+  const mobile = ctx.isMobile
+  const amountSize = mobile ? 'md' : 'lg'
+
+  const stats =
+    insights.count === 0 ? (
+      <p className="m-auto py-6 text-sm text-muted-foreground">Insights appear once there are expenses in this period.</p>
+    ) : (
+      <dl className={cn('grid grid-cols-2', mobile ? 'gap-2.5' : 'flex-1 gap-3 pt-3')}>
+        <Stat
+          mobile={mobile}
+          label="Daily average"
+          value={<Amount cents={insights.dailyAverageCents} currency={currency} size={amountSize} />}
+          hint={`over ${insights.days} ${insights.days === 1 ? 'day' : 'days'}`}
+        />
+        <Stat
+          mobile={mobile}
+          label="Highest day"
+          value={highestDay ? <Amount cents={highestDay.cents} currency={currency} size={amountSize} /> : '—'}
+          hint={highestDay ? format(highestDay.date, 'EEE, MMM d') : ''}
+        />
+        {biggest && (
+          // the biggest expense opens its editor
+          <Stat
+            mobile={mobile}
+            label="Biggest expense"
+            expenseId={biggest.id}
+            value={<Amount cents={biggest.amountCents} currency={currency} size={amountSize} />}
+            hint={`${biggestCategory?.emoji ?? '🧾'} ${biggest.note || biggestCategory?.name || 'Expense'} · ${format(biggest.spentAt, 'MMM d')}`}
+          />
+        )}
+        <Stat
+          mobile={mobile}
+          label="Expenses"
+          value={insights.count.toLocaleString('en-US')}
+          hint={`on ${insights.activeDays} ${insights.activeDays === 1 ? 'day' : 'days'}`}
+        />
+      </dl>
+    )
+
+  if (mobile) {
+    return (
+      <section className={cn('flex flex-col gap-2.5', className)} aria-labelledby="dash-insights">
+        <div className="flex items-baseline justify-between pt-1">
+          <h2 id="dash-insights" className="text-xl font-bold text-ink">
+            Insights
+          </h2>
+          <span className="text-sm text-muted-foreground">{ctx.subtitle}</span>
+        </div>
+        {stats}
+      </section>
+    )
+  }
 
   return (
     <Card className={className}>
@@ -42,37 +95,7 @@ const Insights = ({ ctx, className }: { ctx: DashboardCtx; className?: string })
         <CardTitle>Insights</CardTitle>
         <CardDescription>{ctx.subtitle}</CardDescription>
       </div>
-
-      {insights.count === 0 ? (
-        <p className="m-auto py-6 text-sm text-muted-foreground">Insights appear once there are expenses in this period.</p>
-      ) : (
-        <dl className="grid flex-1 grid-cols-2 gap-3 pt-3">
-          <Stat
-            label="Daily average"
-            value={<Amount cents={insights.dailyAverageCents} currency={currency} size="lg" />}
-            hint={`over ${insights.days} ${insights.days === 1 ? 'day' : 'days'}`}
-          />
-          <Stat
-            label="Highest day"
-            value={highestDay ? <Amount cents={highestDay.cents} currency={currency} size="lg" /> : '—'}
-            hint={highestDay ? format(highestDay.date, 'EEE, MMM d') : ''}
-          />
-          {biggest && (
-            // the biggest expense opens its editor
-            <Stat
-              label="Biggest expense"
-              expenseId={biggest.id}
-              value={<Amount cents={biggest.amountCents} currency={currency} size="lg" />}
-              hint={`${biggestCategory?.emoji ?? '🧾'} ${biggest.note || biggestCategory?.name || 'Expense'} · ${format(biggest.spentAt, 'MMM d')}`}
-            />
-          )}
-          <Stat
-            label="Expenses"
-            value={insights.count.toLocaleString('en-US')}
-            hint={`on ${insights.activeDays} ${insights.activeDays === 1 ? 'day' : 'days'}`}
-          />
-        </dl>
-      )}
+      {stats}
     </Card>
   )
 }

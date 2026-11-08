@@ -12,13 +12,13 @@ import {
   bucketTotals,
   dateRangeToIso,
   getBucketProgress,
-  getBuckets,
+  getChartBuckets,
   getPeriodRange,
   getPeriodSubtitle,
   getPreviousPeriod,
   getRangeDays,
 } from '@/utils/period'
-import { buildInsights, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
+import { assignChartTones, buildInsights, buildStackedBars, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
 
 /** Everything the dashboard shows for the selected period (kept in ui.store, so it survives a reload). */
 export const useDashboard = () => {
@@ -46,10 +46,12 @@ export const useDashboard = () => {
   const categoryById = useMemo(() => new Map((categoriesQuery.data ?? []).map((c) => [c.id, c])), [categoriesQuery.data])
 
   // ---- chart ----
-  const buckets = useMemo(() => getBuckets(period, range), [period, range])
-  const bucketValues = useMemo(() => bucketTotals(buckets, expenses), [buckets, expenses])
-  const progress = getBucketProgress(buckets, now)
-  const labels = buckets.map((b) => b.label)
+  // One set of buckets for both charts: the Month tab uses every day, Week Mon…Sun, Year months, Day 3-hour blocks.
+  const chartBuckets = useMemo(() => getChartBuckets(period, range), [period, range])
+  const lineValues = useMemo(() => bucketTotals(chartBuckets, expenses), [chartBuckets, expenses])
+  const lineLabels = chartBuckets.map((b) => b.label)
+  const chartProgress = getBucketProgress(chartBuckets, now)
+  const lineElapsedCount = chartProgress.elapsedCount
   const subtitle = getPeriodSubtitle(period, range, now)
 
   // ---- totals ----
@@ -62,13 +64,20 @@ export const useDashboard = () => {
     rangeDays: getRangeDays(range),
   })
 
-  const categoryTotals = useMemo(
-    () =>
-      totalsByCategory(expenses).flatMap((t) => {
-        const category = categoryById.get(t.categoryId)
-        return category ? [{ ...t, category }] : []
-      }),
-    [expenses, categoryById],
+  const categoryTotals = useMemo(() => {
+    const rows = totalsByCategory(expenses).flatMap((t) => {
+      const category = categoryById.get(t.categoryId)
+      return category ? [{ ...t, category }] : []
+    })
+    // chart colours: distinct per category (two categories may share a colour in Categories)
+    const tones = assignChartTones(rows.map((r) => r.category))
+    return rows.map((r) => ({ ...r, tone: tones.get(r.category.id) ?? r.category.colourIndex }))
+  }, [expenses, categoryById])
+
+  // stacking order = categories by spending, biggest at the bottom (same order as the donut)
+  const stackedBars = useMemo(
+    () => buildStackedBars(period, chartBuckets, expenses, categoryTotals.map((t) => t.category), new Map(categoryTotals.map((t) => [t.category.id, t.tone]))),
+    [period, chartBuckets, expenses, categoryTotals],
   )
 
   // ---- custom range picker ----
@@ -102,11 +111,12 @@ export const useDashboard = () => {
     // hero card
     totalCents,
     comparison,
-    labels,
-    bucketValues,
-    currentBucketIndex: progress.currentIndex,
-    elapsedCount: progress.elapsedCount,
-    chartLabel: describeSeries(subtitle, labels, bucketValues, currency),
+    currentBucketIndex: chartProgress.currentIndex,
+    stackedBars,
+    lineLabels,
+    lineValues,
+    lineElapsedCount,
+    chartLabel: describeSeries(subtitle, lineLabels, lineValues, currency),
     // lists
     categoryTotals,
     maxCategoryCents: categoryTotals[0]?.cents ?? 0,
