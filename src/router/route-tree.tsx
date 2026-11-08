@@ -40,6 +40,12 @@ const forgotPasswordRoute = createRoute({
   component: lazyRouteComponent(() => import('@/pages/auth/forgot-password')),
 })
 
+const resetPasswordRoute = createRoute({
+  getParentRoute: () => authLayoutRoute,
+  path: '/reset-password',
+  component: lazyRouteComponent(() => import('@/pages/auth/reset-password')),
+})
+
 // ---------------------------- App (signed-in) layout --------------------------
 // ProtectedRoute guard is added in Phase 4.
 
@@ -119,7 +125,7 @@ const devRoutes = import.meta.env.DEV
 // ---------------------------- Tree --------------------------
 
 export const routeTree = rootRoute.addChildren([
-  authLayoutRoute.addChildren([loginRoute, signupRoute, forgotPasswordRoute]),
+  authLayoutRoute.addChildren([loginRoute, signupRoute, forgotPasswordRoute, resetPasswordRoute]),
   appLayoutRoute.addChildren([
     dashboardRoute,
     expensesRoute,

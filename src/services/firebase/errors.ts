@@ -13,6 +13,9 @@ export const toServiceError = (error: unknown): ServiceError => {
     case 'auth/user-not-found':
     case 'auth/invalid-email':
       return new ServiceError('auth/invalid-credentials', 'Incorrect email or password.')
+    case 'auth/expired-action-code':
+    case 'auth/invalid-action-code':
+      return new ServiceError('auth/invalid-link', 'This link has expired or was already used. Request a new one.')
     case 'auth/email-already-in-use':
       return new ServiceError('auth/email-in-use', 'An account with this email already exists.')
     case 'auth/weak-password':

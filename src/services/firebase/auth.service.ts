@@ -1,15 +1,20 @@
 import {
   browserLocalPersistence,
   browserSessionPersistence,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   GoogleAuthProvider,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updatePassword,
   updateProfile,
+  verifyPasswordResetCode,
   type User,
 } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
@@ -17,6 +22,7 @@ import { getFirebaseAuth } from '@/lib/firebase'
 import { DEFAULT_CURRENCY } from '@/utils/money'
 import type { AuthService } from '../contracts'
 import { listeners, runAccountSetup, toAuthUser, waitForAccountSetup } from './auth-listeners'
+import { ServiceError } from '../errors'
 import { guard } from './errors'
 import { profileFirebase } from './profile.service'
 
@@ -32,6 +38,15 @@ const ensureProfile = async (user: User, currency = DEFAULT_CURRENCY) => {
     })
   }
 }
+
+/** Token-refresh errors that mean the login is gone for good (not a flaky connection). */
+const DEAD_SESSION_CODES = new Set([
+  'auth/user-token-expired',
+  'auth/invalid-user-token',
+  'auth/user-disabled',
+  'auth/user-not-found',
+  'auth/id-token-revoked',
+])
 
 export const authFirebase: AuthService = {
   auth_signIn: guard(({ email, password, keepLoggedIn }) =>
@@ -71,14 +86,47 @@ export const authFirebase: AuthService = {
   /** Never reveals whether an account exists for the email. */
   auth_resetPassword: guard(async (email) => {
     try {
-      await sendPasswordResetEmail(getFirebaseAuth(), email.trim())
+      // `url` = where the "Continue" link after a successful reset points (this site's login page)
+      await sendPasswordResetEmail(getFirebaseAuth(), email.trim(), { url: `${window.location.origin}/login` })
     } catch (error) {
       if (error instanceof FirebaseError && error.code === 'auth/user-not-found') return
       throw error
     }
   }),
 
+  /** The reset link opens /reset-password?oobCode=… (set in Firebase console → Authentication → Templates → Password reset). */
+  auth_verifyResetCode: guard((code) => verifyPasswordResetCode(getFirebaseAuth(), code)),
+
+  auth_confirmPasswordReset: guard((code, newPassword) => confirmPasswordReset(getFirebaseAuth(), code, newPassword)),
+
+  auth_changePassword: guard(async (currentPassword, newPassword) => {
+    const user = getFirebaseAuth().currentUser
+    if (!user?.email) throw new ServiceError('auth/not-signed-in', 'Please log in again.')
+    try {
+      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword))
+    } catch (error) {
+      // wrong current password → a message that fits "Change password" (not "Incorrect email or password")
+      if (error instanceof FirebaseError && ['auth/invalid-credential', 'auth/wrong-password', 'auth/invalid-login-credentials'].includes(error.code)) {
+        throw new ServiceError('auth/wrong-password', 'Your current password is incorrect.')
+      }
+      throw error
+    }
+    await updatePassword(user, newPassword)
+  }),
+
   auth_signOut: guard(() => signOut(getFirebaseAuth())),
+
+  auth_isSessionValid: async () => {
+    const user = getFirebaseAuth().currentUser
+    if (!user) return false
+    try {
+      await user.getIdToken(true) // forces a refresh: fails for good when the refresh token was revoked
+      return true
+    } catch (error) {
+      const code = error instanceof FirebaseError ? error.code : ''
+      return !DEAD_SESSION_CODES.has(code)
+    }
+  },
 
   auth_onChange: (callback) => {
     listeners.add(callback)

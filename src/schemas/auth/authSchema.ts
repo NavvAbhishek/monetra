@@ -21,3 +21,22 @@ export type SignupFormValues = z.infer<typeof signupSchema>
 
 export const forgotPasswordSchema = z.object({ email })
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+
+const newPassword = z.string().min(MIN_PASSWORD_LENGTH, `Use at least ${MIN_PASSWORD_LENGTH} characters`)
+
+/** /reset-password — the new password typed twice. */
+export const resetPasswordSchema = z
+  .object({ password: newPassword, confirmPassword: z.string().min(1, 'Type the password again') })
+  .refine((v) => v.password === v.confirmPassword, { path: ['confirmPassword'], message: 'The passwords don’t match' })
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>
+
+/** Settings → Password — current password + the new one typed twice. */
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Enter your current password'),
+    newPassword,
+    confirmPassword: z.string().min(1, 'Type the new password again'),
+  })
+  .refine((v) => v.newPassword === v.confirmPassword, { path: ['confirmPassword'], message: 'The passwords don’t match' })
+  .refine((v) => v.newPassword !== v.currentPassword, { path: ['newPassword'], message: 'Choose a password different from your current one' })
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>

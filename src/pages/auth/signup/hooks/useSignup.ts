@@ -3,7 +3,6 @@ import { useForm, useWatch } from 'react-hook-form'
 import { useGoogleSignInMutation, useSignUpMutation } from '@/queries/auth/auth-mutations'
 import { signupSchema, type SignupFormValues } from '@/schemas/auth/authSchema'
 import { isServiceError } from '@/services'
-import { getPasswordStrength } from '@/utils/password'
 
 export const useSignup = () => {
   const form = useForm<SignupFormValues>({
@@ -14,7 +13,6 @@ export const useSignup = () => {
   const google = useGoogleSignInMutation()
 
   const password = useWatch({ control: form.control, name: 'password' })
-  const strength = getPasswordStrength(password)
 
   const onSubmit = form.handleSubmit((values) =>
     signUp.mutate(values, {
@@ -30,7 +28,7 @@ export const useSignup = () => {
   return {
     form,
     onSubmit,
-    strength,
+    password,
     isSubmitting: signUp.isPending,
     onGoogle: () => google.mutate(),
     isGoogleLoading: google.isPending,

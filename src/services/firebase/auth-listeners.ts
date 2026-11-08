@@ -7,6 +7,7 @@ export const toAuthUser = (user: User): AuthUser => ({
   email: user.email ?? '',
   name: user.displayName || user.email?.split('@')[0] || 'Friend',
   photoURL: user.photoURL,
+  hasPassword: user.providerData.some((p) => p.providerId === 'password'),
 })
 
 type Listener = (user: AuthUser | null) => void

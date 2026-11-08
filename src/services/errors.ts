@@ -10,6 +10,8 @@ export type ServiceErrorCode =
   | 'expense/invalid'
   | 'pastRecord/not-found'
   | 'pastRecord/invalid'
+  | 'auth/wrong-password'
+  | 'auth/invalid-link'
   | 'auth/cancelled'
   | 'auth/too-many-requests'
   | 'auth/not-enabled'

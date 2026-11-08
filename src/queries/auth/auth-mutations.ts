@@ -32,6 +32,20 @@ export const useResetPasswordMutation = () =>
     onError: (error) => Notification.error(errorMessage(error)),
   })
 
+/** Sets the new password from a reset link. The page shows its own success / error state, so no toast. */
+export const useConfirmPasswordResetMutation = () =>
+  useMutation({
+    mutationFn: ({ code, password }: { code: string; password: string }) => API.auth.auth_confirmPasswordReset(code, password),
+  })
+
+/** Settings → Password. The form shows a wrong current password under its field, so only success toasts. */
+export const useChangePasswordMutation = () =>
+  useMutation({
+    mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) =>
+      API.auth.auth_changePassword(currentPassword, newPassword),
+    onSuccess: () => Notification.success('Password changed'),
+  })
+
 export const useSignOutMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({

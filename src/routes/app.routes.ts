@@ -15,6 +15,7 @@ export const APP_ROUTES: AppRouteMeta[] = [
   { path: '/login', label: 'Log in' },
   { path: '/signup', label: 'Create account' },
   { path: '/forgot-password', label: 'Reset password' },
+  { path: '/reset-password', label: 'Choose a new password' },
   // App
   { path: '/', label: 'Dashboard' },
   { path: '/expenses', label: 'Expenses' },

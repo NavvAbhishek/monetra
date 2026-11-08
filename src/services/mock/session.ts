@@ -54,6 +54,7 @@ export const toAuthUser = (user: MockUser): AuthUser => ({
   email: user.email,
   name: user.name,
   photoURL: user.photoURL ?? null,
+  hasPassword: true,
 })
 
 export const getCurrentUser = (): AuthUser | null => {

@@ -14,6 +14,12 @@ const nameFromEmail = (email: string) => {
   return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'Friend'
 }
 
+const requireStrongPassword = (password: string) => {
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    throw new ServiceError('auth/invalid-credentials', `Use at least ${MIN_PASSWORD_LENGTH} characters.`)
+  }
+}
+
 const requireValidPassword = (password: string) => {
   if (password.length < MIN_PASSWORD_LENGTH) {
     throw new ServiceError('auth/invalid-credentials', 'Incorrect email or password.')
@@ -78,9 +84,39 @@ export const authMock: AuthService = {
     await delay() // always "succeeds" — never reveals whether the email has an account
   },
 
+  /** Demo: any code works and belongs to the demo account, except the code "expired". */
+  async auth_verifyResetCode(code: string): Promise<string> {
+    await delay()
+    if (!code || code === 'expired') {
+      throw new ServiceError('auth/invalid-link', 'This link has expired or was already used. Request a new one.')
+    }
+    return DEMO_EMAIL
+  },
+
+  async auth_confirmPasswordReset(code: string, newPassword: string): Promise<void> {
+    await delay()
+    if (!code || code === 'expired') {
+      throw new ServiceError('auth/invalid-link', 'This link has expired or was already used. Request a new one.')
+    }
+    requireStrongPassword(newPassword)
+  },
+
+  /** Demo: the mock keeps no passwords, so any current password of 8+ characters is accepted. */
+  async auth_changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await delay()
+    if (currentPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new ServiceError('auth/wrong-password', 'Your current password is incorrect.')
+    }
+    requireStrongPassword(newPassword)
+  },
+
   async auth_signOut(): Promise<void> {
     await delay(0)
     clearSession()
+  },
+
+  async auth_isSessionValid(): Promise<boolean> {
+    return getCurrentUser() !== null
   },
 
   auth_onChange: subscribeAuth,

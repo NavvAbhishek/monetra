@@ -7,6 +7,8 @@ import type { DateRange } from '@/types/period'
  */
 export const QUERY_KEYS = {
   profile: ['profile'] as const,
+  /** The code from a password-reset link (checked once when /reset-password opens). */
+  resetCode: (code: string) => ['resetCode', code] as const,
   categories: ['categories'] as const,
   /** Prefix for every expenses query — use it to invalidate or patch them all. */
   expensesRoot: ['expenses'] as const,

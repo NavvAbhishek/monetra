@@ -14,7 +14,7 @@ const ForgotPassword = () => {
   if (sentTo) {
     return (
       <div className="flex flex-col gap-4">
-        <AuthHeading title="Check your email" description={<>We sent a reset link to <strong className="text-ink">{sentTo}</strong>, if an account exists.</>} />
+        <AuthHeading title="Check your email" description={<>If an account exists for <strong className="text-ink">{sentTo}</strong>, we sent a reset link. It works once and for one hour. Check your spam folder too.</>} />
         <Button size="xl" fullWidth asChild>
           <Link to="/login">Back to log in</Link>
         </Button>

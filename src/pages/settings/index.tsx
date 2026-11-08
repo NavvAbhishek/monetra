@@ -2,6 +2,7 @@ import { PageHeader } from '@/components/ui/page-header'
 import AccountSection from './components/AccountSection'
 import AppearanceSection from './components/AppearanceSection'
 import DataSection from './components/DataSection'
+import PasswordSection from './components/PasswordSection'
 import PastSpendingSection from './components/PastSpendingSection'
 import ProfileSection from './components/ProfileSection'
 import { useSettings } from './hooks/useSettings'
@@ -13,6 +14,7 @@ const Settings = () => {
     <div className="flex max-w-3xl flex-col gap-4.5">
       <PageHeader title="Settings" description="Your profile, theme and data." />
       <ProfileSection profile={ctx.profile} isLoading={ctx.isProfileLoading} photoURL={ctx.user?.photoURL} />
+      <PasswordSection hasPassword={ctx.user?.hasPassword ?? true} />
       <AppearanceSection ctx={ctx} />
       <PastSpendingSection />
       <DataSection ctx={ctx} />

@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Fragment, Suspense } from 'react'
 import * as Icon from '@/components/icons'
 import AuthShowcase, { type AuthShowcaseVariant } from '@/components/partials/AuthShowcase'
 import EmojiCollage from '@/components/partials/EmojiCollage'
@@ -19,7 +19,11 @@ const SCREENS: Record<string, AuthScreen> = {
   '/login': { showcase: 'tiles', mobileHero: true },
   '/signup': { showcase: 'summary', mobileHero: false },
   '/forgot-password': { showcase: 'tiles', mobileHero: false },
+  '/reset-password': { showcase: 'tiles', mobileHero: false },
 }
+
+/** Pages that must stay reachable while logged in (the link in a reset email opens here). */
+const OPEN_TO_SIGNED_IN = new Set(['/reset-password'])
 
 /**
  * Logged-out shell. Desktop (D5/D6): purple showcase panel + centred form.
@@ -29,9 +33,10 @@ const SCREENS: Record<string, AuthScreen> = {
 const AuthLayout = () => {
   const { pathname } = useLocation()
   const screen = SCREENS[pathname] ?? SCREENS['/login']
+  const Guard = OPEN_TO_SIGNED_IN.has(pathname) ? Fragment : GuestRoute
 
   return (
-    <GuestRoute>
+    <Guard>
       <div className="min-h-svh lg:flex">
         <AuthShowcase variant={screen.showcase} className="hidden lg:flex" />
 
@@ -62,7 +67,7 @@ const AuthLayout = () => {
           </main>
         </div>
       </div>
-    </GuestRoute>
+    </Guard>
   )
 }
 

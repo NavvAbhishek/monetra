@@ -19,8 +19,20 @@ export interface AuthService {
   auth_signIn(input: SignInInput): Promise<AuthUser>
   auth_signUp(input: SignUpInput): Promise<AuthUser>
   auth_google(): Promise<AuthUser>
+  /** Emails a reset link. Never reveals whether the email has an account. */
   auth_resetPassword(email: string): Promise<void>
+  /** Checks the code from a reset link and returns the account's email. Throws `auth/invalid-link` if expired / used / wrong. */
+  auth_verifyResetCode(code: string): Promise<string>
+  /** Sets the new password from a reset link (the code is single-use). */
+  auth_confirmPasswordReset(code: string, newPassword: string): Promise<void>
+  /** Signed-in user changes their password: re-checks the current one first (`auth/wrong-password` if it is wrong). */
+  auth_changePassword(currentPassword: string, newPassword: string): Promise<void>
   auth_signOut(): Promise<void>
+  /**
+   * Is the saved login still accepted by the backend? `false` only when it was revoked / expired for good
+   * (e.g. the password was reset on another device). A network problem counts as still valid.
+   */
+  auth_isSessionValid(): Promise<boolean>
   /** Calls `callback` with the current user right away, then on every sign-in / sign-out. */
   auth_onChange(callback: (user: AuthUser | null) => void): Unsubscribe
 }
