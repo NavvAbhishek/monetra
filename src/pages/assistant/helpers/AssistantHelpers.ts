@@ -37,3 +37,4 @@ export const splitBold = (text: string): { text: string; bold: boolean }[] =>
     .split(/(\*\*[^*]+\*\*)/g)
     .filter(Boolean)
     .map((part) => (part.startsWith('**') && part.endsWith('**') ? { text: part.slice(2, -2), bold: true } : { text: part, bold: false }))
+

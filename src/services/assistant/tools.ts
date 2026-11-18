@@ -211,14 +211,30 @@ export const runAssistantTool = async (name: string, args: Args, data: Assistant
   }
 }
 
-/** Instructions for the model: who it is, today's date, the currency and category names, and how to answer. */
-export const buildSystemInstruction = (data: AssistantData, now = new Date()): string =>
+/**
+ * This month's and last month's summaries, computed before the question is sent: the most common questions
+ * ("this month", "last month", "compare them") are then answered in ONE call to the model, with no tool round trip.
+ */
+export const buildQuickFacts = async (data: AssistantData, now = new Date()): Promise<string> => {
+  const iso = (d: Date) => format(d, ISO)
+  const monthStart = startOfMonth(now)
+  const lastMonthStart = addMonths(monthStart, -1)
+  const [thisMonth, lastMonth] = await Promise.all([
+    summary({ from: iso(monthStart), to: iso(now) }, data, now),
+    summary({ from: iso(lastMonthStart), to: iso(addDays(monthStart, -1)) }, data, now),
+  ])
+  return JSON.stringify({ thisMonthSoFar: thisMonth, lastMonth })
+}
+
+/** Instructions for the model: who it is, today's date, the currency and category names, quick facts, and how to answer. */
+export const buildSystemInstruction = (data: AssistantData, quickFacts: string, now = new Date()): string =>
   [
     'You are the assistant inside Monetra, a personal expense tracker. You answer questions about the user\'s own spending.',
     `Today is ${format(now, 'EEEE, yyyy-MM-dd')}. Weeks start on Monday. Currency: ${data.currency}.`,
     `The user's categories: ${[...data.categories.map((c) => c.name), UNSPLIT_CATEGORY.name].join(', ')}.`,
+    `Quick facts (already computed with the tools — use them directly, no tool call needed): ${quickFacts}`,
     'Rules:',
-    '- ALWAYS get numbers from the tools. Never guess, estimate or do your own arithmetic when a tool can give the figure; to compare periods, call the tools for each period and report the tool amounts.',
+    '- For anything not in the quick facts, ALWAYS get numbers from the tools. Never guess, estimate or do your own arithmetic when a tool can give the figure; to compare periods, call the tools for each period and report the tool amounts.',
     '- Turn relative dates ("this month", "last year", "since March") into exact YYYY-MM-DD dates using today\'s date. "All time" means from 2000-01-01 to today.',
     '- Map the user\'s words to the closest category name above (e.g. "eating out" → a food category). If unsure, ask.',
     '- Use the formatted "amount" strings from the tools exactly as given.',

@@ -91,6 +91,10 @@ export type AssistantAskInput = {
   /** Earlier messages of this chat, oldest first (for follow-up questions). */
   history: ChatMessage[]
   question: string
+  /** Gemini model id (constant/assistantModels.ts). */
+  model: string
+  /** Called with the answer so far while it is being written (streaming). */
+  onText?: (textSoFar: string) => void
 }
 
 /** The spending assistant (chatbot). Firebase = Gemini through Firebase AI Logic; mock = a canned demo answer. */

@@ -19,7 +19,7 @@ const Assistant = () => {
   // keep the newest message (or the "thinking" bubble) in view
   useEffect(() => {
     if (ctx.messages.length > 0) endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [ctx.messages.length, ctx.isThinking])
+  }, [ctx.messages.length, ctx.isThinking, ctx.streamingText])
 
   return (
     <div className="mx-auto flex min-h-full max-w-4xl flex-col gap-4">
@@ -28,7 +28,7 @@ const Assistant = () => {
         description="Questions about your spending, answered from your own data."
         actions={
           hasMessages && (
-            <Button variant="surface" size="sm" onClick={ctx.newChat} disabled={ctx.isThinking}>
+            <Button variant="surface" onClick={ctx.newChat} disabled={ctx.isThinking}>
               <Icon.Plus aria-hidden />
               New chat
             </Button>

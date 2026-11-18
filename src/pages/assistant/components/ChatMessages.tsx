@@ -1,5 +1,6 @@
 import * as Icon from '@/components/icons'
 import { Button } from '@/components/ui/button'
+import { getAssistantModel } from '@/constant/assistantModels'
 import { cn } from '@/lib/utils'
 import type { AssistantCtx } from '../hooks/useAssistant'
 import AssistantText from './AssistantText'
@@ -25,6 +26,7 @@ const ChatMessages = ({ ctx }: { ctx: AssistantCtx }) => {
             {m.error ? <Icon.TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden /> : <Icon.Sparkles className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />}
             <div className="flex min-w-0 flex-col gap-2">
               {m.error ? <p>{m.text}</p> : <AssistantText text={m.text} />}
+              {!m.error && m.model && <p className="text-2xs text-muted-foreground">Answered by {getAssistantModel(m.model).name}</p>}
               {m.error && m.id === lastId && !ctx.isThinking && (
                 <Button size="sm" variant="danger-soft" onClick={ctx.retry} className="self-start">
                   <Icon.RotateCcw aria-hidden />
@@ -35,12 +37,19 @@ const ChatMessages = ({ ctx }: { ctx: AssistantCtx }) => {
           </li>
         ),
       )}
-      {ctx.isThinking && (
-        <li className="flex items-center gap-2.5 self-start rounded-tile rounded-bl-check bg-card px-4 py-3 text-base text-muted-foreground shadow-panel">
-          <Icon.Sparkles className="size-4 animate-pulse text-primary" aria-hidden />
-          Looking at your spending…
-        </li>
-      )}
+      {ctx.isThinking &&
+        (ctx.streamingText ? (
+          // the answer appears word by word while Gemini writes it
+          <li className="mr-6 flex max-w-2xl gap-2.5 self-start rounded-tile rounded-bl-check bg-card px-4 py-3 text-base text-ink shadow-panel">
+            <Icon.Sparkles className="mt-0.5 size-4 shrink-0 animate-pulse text-primary" aria-hidden />
+            <AssistantText text={ctx.streamingText} />
+          </li>
+        ) : (
+          <li className="flex items-center gap-2.5 self-start rounded-tile rounded-bl-check bg-card px-4 py-3 text-base text-muted-foreground shadow-panel">
+            <Icon.Sparkles className="size-4 animate-pulse text-primary" aria-hidden />
+            Looking at your spending…
+          </li>
+        ))}
     </ol>
   )
 }

@@ -5,4 +5,6 @@ export type ChatMessage = {
   text: string
   /** The assistant's reply failed — the text is the error to show. */
   error?: boolean
+  /** Model that wrote this answer (shown under it). */
+  model?: string
 }
