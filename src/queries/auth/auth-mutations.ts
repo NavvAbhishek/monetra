@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import API from '@/services'
 import type { SignInInput, SignUpInput } from '@/services/contracts'
+import { useAssistantStore } from '@/stores/assistant.store'
 import { Notification } from '@/utils/notification'
 import { errorMessage } from '../session'
 
@@ -51,7 +52,10 @@ export const useSignOutMutation = () => {
   return useMutation({
     mutationFn: () => API.auth.auth_signOut(),
     // Another account must never see this one's cached data.
-    onSuccess: () => queryClient.clear(),
+    onSuccess: () => {
+      queryClient.clear()
+      useAssistantStore.getState().reset() // the chat is private too
+    },
     onError: (error) => Notification.error(errorMessage(error)),
   })
 }

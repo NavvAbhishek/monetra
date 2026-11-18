@@ -11,6 +11,12 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_STORAGE_BUCKET?: string
   readonly VITE_FIREBASE_MESSAGING_SENDER_ID?: string
   readonly VITE_FIREBASE_APP_ID?: string
+  /** Fraud Defense (reCAPTCHA Enterprise) key ID for App Check — the assistant needs it. Public. */
+  readonly VITE_RECAPTCHA_SITE_KEY?: string
+  /** App Check debug token, localhost only (never in GitHub). */
+  readonly VITE_APPCHECK_DEBUG_TOKEN?: string
+  /** Optional: override the Gemini model the assistant uses. */
+  readonly VITE_GEMINI_MODEL?: string
 }
 
 interface ImportMeta {

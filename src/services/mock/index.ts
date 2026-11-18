@@ -1,4 +1,5 @@
 import type { Backend } from '../contracts'
+import { assistantMock } from './assistant.mock'
 import { authMock } from './auth.mock'
 import { categoriesMock } from './categories.mock'
 import { expensesMock } from './expenses.mock'
@@ -10,5 +11,6 @@ export const mockBackend: Backend = {
   profile: profileMock,
   categories: categoriesMock,
   expenses: expensesMock,
+  assistant: assistantMock,
   pastRecords: pastRecordsMock,
 }
