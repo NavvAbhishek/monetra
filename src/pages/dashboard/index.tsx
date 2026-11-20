@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { IconButton } from '@/components/ui/icon-button'
 import { PageHeader } from '@/components/ui/page-header'
+import AskAssistantCard from './components/AskAssistantCard'
 import CategoryBreakdown from './components/CategoryBreakdown'
 import DashboardPeriodTabs from './components/DashboardPeriodTabs'
 import DashboardSkeleton from './components/DashboardSkeleton'
@@ -43,6 +44,7 @@ const Dashboard = () => {
       <SpentCard ctx={ctx} />
       <CategoryBreakdown ctx={ctx} />
       <Insights ctx={ctx} />
+      <AskAssistantCard />
       <AllTimeCard />
     </>
   ) : (

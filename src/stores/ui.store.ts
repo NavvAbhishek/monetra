@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { type AssistantModelId, DEFAULT_ASSISTANT_MODEL } from '@/constant/assistantModels'
 import { DEFAULT_THEME_COLOR, type ThemeColorId } from '@/constant/themeColors'
 import type { IsoDateRange, PeriodKey } from '@/types/period'
 
@@ -14,11 +15,14 @@ interface UIState {
   themeColor: ThemeColorId
   /** Desktop sidebar shrunk to an icon strip (saved on this device). */
   sidebarCollapsed: boolean
+  /** Gemini model picked on the Ask AI page (saved on this device). */
+  assistantModel: AssistantModelId
   setPeriod: (period: PeriodKey) => void
   setCustomRange: (range: IsoDateRange | null) => void
   setLastCategoryId: (id: string | null) => void
   setThemeColor: (id: ThemeColorId) => void
   toggleSidebar: () => void
+  setAssistantModel: (id: AssistantModelId) => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -29,11 +33,13 @@ export const useUIStore = create<UIState>()(
       lastCategoryId: null,
       themeColor: DEFAULT_THEME_COLOR,
       sidebarCollapsed: false,
+      assistantModel: DEFAULT_ASSISTANT_MODEL,
       setPeriod: (period) => set({ period }),
       setCustomRange: (customRange) => set({ customRange }),
       setLastCategoryId: (lastCategoryId) => set({ lastCategoryId }),
       setThemeColor: (themeColor) => set({ themeColor }),
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
+      setAssistantModel: (assistantModel) => set({ assistantModel }),
     }),
     { name: 'monetra-ui', version: 1 },
   ),

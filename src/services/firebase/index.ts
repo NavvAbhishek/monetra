@@ -1,4 +1,5 @@
 import type { Backend } from '../contracts'
+import { assistantFirebase } from './assistant.service'
 import { authFirebase } from './auth.service'
 import { categoriesFirebase } from './categories.service'
 import { expensesFirebase } from './expenses.service'
@@ -10,5 +11,6 @@ export const firebaseBackend: Backend = {
   profile: profileFirebase,
   categories: categoriesFirebase,
   expenses: expensesFirebase,
+  assistant: assistantFirebase,
   pastRecords: pastRecordsFirebase,
 }

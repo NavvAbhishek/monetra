@@ -17,7 +17,8 @@ export default defineConfig({
         // Firebase SDK in its own long-cached file: an app update doesn't make users re-download it.
         // (Other libraries stay split per page, so pages still load only what they need.)
         codeSplitting: {
-          groups: [{ name: 'firebase', test: /node_modules[\\/](@firebase|firebase)[\\/]/ }],
+          // AI + App Check are left out: they load only when Ask AI is opened
+          groups: [{ name: 'firebase', test: /node_modules[\\/](?:@firebase|firebase)[\\/](?!ai[\\/]|app-check)/ }],
         },
       },
     },

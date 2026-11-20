@@ -1,3 +1,4 @@
+import type { ChatMessage } from '@/types/assistant'
 import type { AuthUser } from '@/types/auth'
 import type { Category, CategoryInput } from '@/types/category'
 import type { Expense, ExpenseInput } from '@/types/expense'
@@ -86,10 +87,27 @@ export interface PastRecordsService {
   pastRecord_reassignCategory(uid: string, fromCategoryId: string, toCategoryId: string | null): Promise<number>
 }
 
+export type AssistantAskInput = {
+  /** Earlier messages of this chat, oldest first (for follow-up questions). */
+  history: ChatMessage[]
+  question: string
+  /** Gemini model id (constant/assistantModels.ts). */
+  model: string
+  /** Called with the answer so far while it is being written (streaming). */
+  onText?: (textSoFar: string) => void
+}
+
+/** The spending assistant (chatbot). Firebase = Gemini through Firebase AI Logic; mock = a canned demo answer. */
+export interface AssistantService {
+  /** Answers a question about the user's spending. Throws `assistant/quota`, `assistant/unavailable` or `assistant/not-configured`. */
+  assistant_ask(uid: string, input: AssistantAskInput): Promise<string>
+}
+
 export interface Backend {
   auth: AuthService
   profile: ProfileService
   categories: CategoriesService
   expenses: ExpensesService
   pastRecords: PastRecordsService
+  assistant: AssistantService
 }
