@@ -56,6 +56,7 @@ export const expensesMock: ExpensesService = {
       categoryId: input.categoryId,
       spentAt: new Date(input.spentAt),
       note: input.note.trim(),
+      ...(input.amountParts ? { amountParts: [...input.amountParts] } : {}),
       createdAt: now,
       updatedAt: now,
     }
@@ -72,6 +73,7 @@ export const expensesMock: ExpensesService = {
     expense.categoryId = input.categoryId
     expense.spentAt = new Date(input.spentAt)
     expense.note = input.note.trim()
+    expense.amountParts = input.amountParts ? [...input.amountParts] : undefined
     expense.updatedAt = new Date()
     saveDb()
     return cloneExpense(expense)

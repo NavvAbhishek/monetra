@@ -1,6 +1,7 @@
 import {
   count,
   deleteDoc,
+  deleteField,
   getAggregateFromServer,
   limit,
   sum,
@@ -46,6 +47,7 @@ const toData = (input: ExpenseInput) => ({
   categoryId: input.categoryId,
   spentAt: toTimestamp(input.spentAt),
   note: input.note.trim(),
+  ...(input.amountParts ? { amountParts: input.amountParts } : {}),
 })
 
 export const expensesFirebase: ExpensesService = {
@@ -79,7 +81,8 @@ export const expensesFirebase: ExpensesService = {
     await validate(uid, input)
     const ref = expenseRef(uid, id)
     if (!(await getDoc(ref)).exists()) throw notFound()
-    await updateDoc(ref, { ...toData(input), updatedAt: Timestamp.now() })
+    // a single amount removes any old parts
+    await updateDoc(ref, { ...toData(input), ...(input.amountParts ? {} : { amountParts: deleteField() }), updatedAt: Timestamp.now() })
     return expenseFromDoc(await getDoc(ref))
   }),
 

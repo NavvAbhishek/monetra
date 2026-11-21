@@ -262,6 +262,22 @@
 }
 
 /* Respect "reduce motion": no slide / zoom / fade animations, instant transitions. */
+/* Branded loading screen (components/PageLoader.tsx): a short bar sliding through a track, and a soft "breathing" logo. */
+@keyframes loader-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+@keyframes loader-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@utility animate-loader-slide {
+  animation: loader-slide 1.2s ease-in-out infinite;
+}
+@utility animate-loader-breathe {
+  animation: loader-breathe 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

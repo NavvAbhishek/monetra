@@ -22,7 +22,7 @@ const CategoryCard = ({ category, stats, currency, compact, selected }: Category
     tone={category.colourIndex}
     selected={selected}
     size={compact ? 'md' : 'lg'}
-    className={compact ? 'relative h-32 justify-between rounded-table p-3.5' : 'h-39.5 justify-between'}
+    className={compact ? 'relative h-32 justify-between rounded-table p-3.5' : 'h-32 min-h-0 justify-between p-4'}
   >
     <Link to="/categories/$categoryId" params={{ categoryId: category.id }}>
       {compact ? (
@@ -44,14 +44,14 @@ const CategoryCard = ({ category, stats, currency, compact, selected }: Category
       ) : (
         <>
           <span className="flex items-start justify-between">
-            <span className="text-emoji-xl" aria-hidden>
+            <span className="text-emoji-lg" aria-hidden>
               {category.emoji}
             </span>
             <span className="text-xs font-semibold text-text-soft">{pluralise(stats.count, 'entry', 'entries')}</span>
           </span>
           <span className="flex min-w-0 flex-col">
-            <span className="truncate text-lg font-bold text-ink">{category.name}</span>
-            <Amount cents={stats.cents} currency={currency} size="lg" />
+            <span className="truncate text-md font-bold text-ink">{category.name}</span>
+            <Amount cents={stats.cents} currency={currency} size="md" className="truncate" />
           </span>
         </>
       )}

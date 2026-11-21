@@ -45,6 +45,7 @@ export const expenseFromDoc = (snap: DocumentSnapshot<DocumentData>): Expense =>
     categoryId: str(d.categoryId),
     spentAt: toDate(d.spentAt),
     note: str(d.note),
+    amountParts: Array.isArray(d.amountParts) && d.amountParts.length >= 2 ? d.amountParts.map(num) : undefined,
     createdAt: toDate(d.createdAt),
     updatedAt: toDate(d.updatedAt),
   }

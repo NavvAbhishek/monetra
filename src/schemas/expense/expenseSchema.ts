@@ -1,9 +1,9 @@
 import { isValid, parse } from 'date-fns'
 import { z } from 'zod'
 import { MAX_NOTE_LENGTH } from '@/constant/defaultCategories'
-import type { Expense, ExpenseInput } from '@/types/expense'
-import { sumAmountExpression } from '@/utils/amountExpression'
-import { fromCents, getCurrencyDigits } from '@/utils/money'
+import { type Expense, type ExpenseInput, MAX_AMOUNT_PARTS } from '@/types/expense'
+import { splitAmountParts, sumAmountExpression } from '@/utils/amountExpression'
+import { fromCents, getCurrencyDigits, toCents } from '@/utils/money'
 
 /** Same ceiling as the security rules (amountCents < 100,000,000,000). */
 const MAX_TOTAL_CENTS = 100_000_000_000
@@ -55,20 +55,26 @@ export const expenseFormToInput = (
   values: ExpenseFormValues,
   currency: string,
   now: Date = new Date(),
-): ExpenseInput => ({
-  // the amount field may hold several chips ("500+100+600") — saved ONCE as their total
-  amountCents: sumAmountExpression(values.amount, currency) ?? 0,
-  categoryId: values.categoryId,
-  spentAt: resolveSpentAt(values.date, values.time, now),
-  note: values.note.trim(),
-})
+): ExpenseInput => {
+  // the amount field may hold several chips ("500+100+600"): ONE expense with their total, and the parts kept
+  // alongside so the list can show what the total was made of
+  const parts = splitAmountParts(values.amount).map((part) => toCents(part, currency) ?? 0)
+  return {
+    amountCents: sumAmountExpression(values.amount, currency) ?? 0,
+    categoryId: values.categoryId,
+    spentAt: resolveSpentAt(values.date, values.time, now),
+    note: values.note.trim(),
+    amountParts: parts.length >= 2 && parts.length <= MAX_AMOUNT_PARTS && parts.every((c) => c > 0) ? parts : undefined,
+  }
+}
 
 /** Expense → values for the edit form. */
 export const expenseToFormValues = (expense: Expense, currency: string): ExpenseFormValues => {
   const pad = (n: number) => String(n).padStart(2, '0')
   const d = expense.spentAt
   return {
-    amount: fromCents(expense.amountCents, currency).toFixed(getCurrencyDigits(currency)),
+    // the parts come back as chips when there were several
+    amount: (expense.amountParts ?? [expense.amountCents]).map((c) => fromCents(c, currency).toFixed(getCurrencyDigits(currency))).join('+'),
     categoryId: expense.categoryId,
     date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
     time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,

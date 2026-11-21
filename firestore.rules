@@ -40,8 +40,11 @@ service cloud.firestore {
     }
 
     // users/{uid}/expenses/{id} — money is integer cents (CLAUDE.md §7.2)
+    // `amountParts` (optional): the separate amounts the total was made of (amount chips), 2–20 of them
     function validExpense(d) {
-      return hasExactly(d, ['amountCents', 'categoryId', 'spentAt', 'note', 'createdAt', 'updatedAt'])
+      return d.keys().hasAll(['amountCents', 'categoryId', 'spentAt', 'note', 'createdAt', 'updatedAt'])
+        && d.keys().hasOnly(['amountCents', 'categoryId', 'spentAt', 'note', 'createdAt', 'updatedAt', 'amountParts'])
+        && (!('amountParts' in d) || (d.amountParts is list && d.amountParts.size() >= 2 && d.amountParts.size() <= 20))
         && d.amountCents is int && d.amountCents > 0 && d.amountCents < 100000000000
         && isText(d.categoryId, 1, 128)
         && d.spentAt is timestamp

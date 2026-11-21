@@ -13,14 +13,13 @@ import ExpenseDialog from './components/ExpenseDialog'
 import ExpenseEditorScreen from './components/ExpenseEditorScreen'
 import ExpenseNotFound from './components/ExpenseNotFound'
 import ExpensesSkeleton from './components/ExpensesSkeleton'
-import ExpensesTable from './components/ExpensesTable'
 import ExpensesToolbar from './components/ExpensesToolbar'
 import MobileFilters from './components/MobileFilters'
 import { useExpenses } from './hooks/useExpenses'
 
 /**
  * /expenses, /expenses/new and /expenses/$expenseId all render this page (CLAUDE.md §4).
- * Desktop (D2/D3): table + add / edit modal. Mobile (M2/M3): day-grouped list, or the full-screen editor.
+ * Both: day-grouped list (M2 style). Desktop: + add / edit modal (D3). Mobile: the full-screen editor (M3).
  */
 const Expenses = () => {
   const ctx = useExpenses()
@@ -68,14 +67,13 @@ const Expenses = () => {
         </Button>
       }
     />
-  ) : isMobile ? (
+  ) : (
+    // grouped by day on every screen size (the desktop table was replaced on 2026-11-20)
     <div className="flex flex-col gap-3.5">
       {ctx.dayGroups.map((group) => (
         <ExpenseDayGroup key={group.key} group={group} ctx={ctx} />
       ))}
     </div>
-  ) : (
-    <ExpensesTable ctx={ctx} />
   )
 
   return (
