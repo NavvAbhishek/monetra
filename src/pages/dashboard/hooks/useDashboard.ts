@@ -1,19 +1,22 @@
+import { addDays, format, startOfDay } from 'date-fns'
 import { useMemo, useRef, useState } from 'react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { usePastItems } from '@/hooks/use-past-items'
 import { useGetCategoriesQuery } from '@/queries/categories/categories-queries'
-import { useGetExpensesQuery } from '@/queries/expenses/expenses-queries'
+import { useGetExpensesQuery, useGetExpenseTotalsQuery } from '@/queries/expenses/expenses-queries'
+import { useGetPastRecordsQuery } from '@/queries/past-records/past-records-queries'
 import { useGetProfileQuery } from '@/queries/profile/profile-queries'
 import { useAuthStore } from '@/stores/auth.store'
 import { useUIStore } from '@/stores/ui.store'
-import type { IsoDateRange, PeriodKey } from '@/types/period'
+import type { DashboardPeriod, DateRange, IsoDateRange } from '@/types/period'
 import { assignChartTones } from '@/utils/chart-tones'
 import { buildStackedBars } from '@/utils/stacked-bars'
-import { compareTotals, sumCents, totalsByCategory } from '@/utils/aggregate'
+import { type Comparison, compareTotals, sumCents, totalsByCategory } from '@/utils/aggregate'
 import { DEFAULT_CURRENCY } from '@/utils/money'
 import { UNSPLIT_CATEGORY } from '@/utils/pastSpending'
 import {
   bucketTotals,
+  getAllTimeBuckets,
   getBucketTitle,
   dateRangeToIso,
   getBucketProgress,
@@ -22,8 +25,9 @@ import {
   getPeriodSubtitle,
   getPreviousPeriod,
   getRangeDays,
+  parseIsoDate,
 } from '@/utils/period'
-import { buildInsights, describeSeries, getFirstName } from '../helpers/DashboardHelpers'
+import { buildInsights, describeSeries, getBarChartTitle, getFirstName } from '../helpers/DashboardHelpers'
 
 /** Everything the dashboard shows for the selected period (kept in ui.store, so it survives a reload). */
 export const useDashboard = () => {
@@ -36,13 +40,38 @@ export const useDashboard = () => {
   const [now] = useState(() => new Date())
 
   // ---- ranges ----
-  const range = useMemo(() => getPeriodRange(period, now, customRange), [period, now, customRange])
-  const previous = useMemo(() => getPreviousPeriod(period, range, now), [period, range, now])
+  const isAll = period === 'all'
+  // "All time" starts at the first tracked expense or the first past record, whichever is earlier
+  const totalsQuery = useGetExpenseTotalsQuery({ enabled: isAll })
+  const recordsQuery = useGetPastRecordsQuery()
+  const allStart = useMemo(() => {
+    const starts = [
+      ...(totalsQuery.data?.firstSpentAt ? [startOfDay(totalsQuery.data.firstSpentAt).getTime()] : []),
+      ...(recordsQuery.data ?? []).map((r) => parseIsoDate(r.start).getTime()),
+    ]
+    return starts.length > 0 ? new Date(Math.min(...starts)) : null
+  }, [totalsQuery.data, recordsQuery.data])
+
+  const range = useMemo<DateRange>(
+    () =>
+      period === 'all'
+        ? { start: allStart ?? startOfDay(now), end: addDays(startOfDay(now), 1) }
+        : getPeriodRange(period, now, customRange),
+    [period, now, customRange, allStart],
+  )
+  const previous = useMemo(
+    () =>
+      period === 'all'
+        ? { range: { start: range.start, end: range.start }, name: '', partial: false } // nothing before "all time"
+        : getPreviousPeriod(period, range, now),
+    [period, range, now],
+  )
 
   // ---- data ----
-  const currentQuery = useGetExpensesQuery(range)
-  // The Range tab shows "Custom range · N days" instead of a comparison, so it skips this read.
-  const previousQuery = useGetExpensesQuery(previous.range, { enabled: period !== 'range' })
+  // All time reads every tracked expense, so it waits until the first date is known (and only runs on that tab)
+  const currentQuery = useGetExpensesQuery(range, { enabled: !isAll || totalsQuery.isSuccess })
+  // Range and All time show no comparison, so they skip this read.
+  const previousQuery = useGetExpensesQuery(previous.range, { enabled: period !== 'range' && !isAll })
   const categoriesQuery = useGetCategoriesQuery()
   const profileQuery = useGetProfileQuery()
 
@@ -58,16 +87,20 @@ export const useDashboard = () => {
 
   // ---- chart ----
   // One set of buckets for both charts: the Month tab uses every day, Week Mon…Sun, Year months, Day 3-hour blocks.
-  const chartBuckets = useMemo(() => getChartBuckets(period, range), [period, range])
+  // All time: one bucket per month, or per year once the history is over 3 years
+  const allTime = useMemo(() => (period === 'all' ? getAllTimeBuckets(range) : null), [period, range])
+  const chartBuckets = useMemo(() => (period === 'all' ? (allTime?.buckets ?? []) : getChartBuckets(period, range)), [period, range, allTime])
   const lineValues = useMemo(() => bucketTotals(chartBuckets, expenses), [chartBuckets, expenses])
   const lineLabels = chartBuckets.map((b) => b.label)
   const chartProgress = getBucketProgress(chartBuckets, now)
   const lineElapsedCount = chartProgress.elapsedCount
-  const subtitle = getPeriodSubtitle(period, range, now)
+  const subtitle = period === 'all' ? 'All time' : getPeriodSubtitle(period, range, now)
 
   // ---- totals ----
   const totalCents = sumCents(expenses)
-  const comparison = compareTotals({
+  const comparison: Comparison = isAll
+    ? { direction: 'none', percent: 0, text: `Since ${format(range.start, 'MMMM yyyy')}` }
+    : compareTotals({
     currentCents: totalCents,
     previousCents: sumCents(previousQuery.data ?? []) + sumCents(pastBefore.items),
     period,
@@ -93,15 +126,16 @@ export const useDashboard = () => {
         expenses,
         categoryTotals.map((t) => t.category),
         new Map(categoryTotals.map((t) => [t.category.id, t.tone])),
-        (bucket) => getBucketTitle(period, bucket),
+        (bucket) =>
+          period === 'all' ? format(bucket.start, allTime?.unit === 'year' ? 'yyyy' : 'MMMM yyyy') : getBucketTitle(period, bucket),
       ),
-    [period, chartBuckets, expenses, categoryTotals],
+    [period, allTime, chartBuckets, expenses, categoryTotals],
   )
 
   // ---- custom range picker ----
   const [pickerOpen, setPickerOpen] = useState(false)
   // Tab to go back to if the picker is cancelled before any custom range was ever chosen.
-  const periodBeforeRange = useRef<PeriodKey>(period === 'range' ? 'week' : period)
+  const periodBeforeRange = useRef<DashboardPeriod>(period === 'range' ? 'week' : period)
 
   const openPicker = () => {
     if (period !== 'range') periodBeforeRange.current = period
@@ -124,8 +158,9 @@ export const useDashboard = () => {
     currency,
     // period
     period,
-    changePeriod: (next: PeriodKey) => (next === 'range' ? openPicker() : setPeriod(next)),
+    changePeriod: (next: DashboardPeriod) => (next === 'range' ? openPicker() : setPeriod(next)),
     subtitle,
+    barChartTitle: period === 'all' ? `Spending by ${allTime?.unit ?? 'month'}` : getBarChartTitle(period),
     // hero card
     totalCents,
     comparison,
@@ -143,8 +178,11 @@ export const useDashboard = () => {
     // state
     includesPast: pastNow.items.length > 0,
     pastIsEstimate: pastNow.hasEstimates,
-    isLoading: currentQuery.isPending || categoriesQuery.isPending || pastNow.isLoading,
-    isError: currentQuery.isError || categoriesQuery.isError,
+    isLoading:
+      categoriesQuery.isPending ||
+      pastNow.isLoading ||
+      (isAll ? totalsQuery.isPending || (totalsQuery.isSuccess && currentQuery.isPending) : currentQuery.isPending),
+    isError: currentQuery.isError || categoriesQuery.isError || (isAll && totalsQuery.isError),
     retry: () => {
       void currentQuery.refetch()
       void categoriesQuery.refetch()

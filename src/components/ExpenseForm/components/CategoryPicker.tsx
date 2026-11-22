@@ -7,7 +7,7 @@ export type CategoryPickerProps = {
   categories: readonly Category[]
   value: string
   onChange: (categoryId: string) => void
-  /** dialog = 6 columns (D3) · screen = 3 columns, taller tiles (M3). */
+  /** dialog = 6 columns (D3) · screen = phones / tablets (M3): 4 columns (5–6 on wider screens), compact tiles. */
   layout: 'dialog' | 'screen'
   id?: string
 }
@@ -19,7 +19,7 @@ const CategoryPicker = ({ categories, value, onChange, layout, id }: CategoryPic
     aria-label="Category"
     value={value}
     onValueChange={onChange}
-    className={cn('grid gap-2', layout === 'dialog' ? 'grid-cols-6' : 'grid-cols-3 gap-2.5')}
+    className={cn('grid gap-2', layout === 'dialog' ? 'grid-cols-6' : 'grid-cols-4 sm:grid-cols-5 md:grid-cols-6')}
   >
     {categories.map((category) => (
       <Tile
@@ -29,13 +29,13 @@ const CategoryPicker = ({ categories, value, onChange, layout, id }: CategoryPic
         size="sm"
         tone={category.colourIndex}
         selected={category.id === value}
-        className={layout === 'screen' ? 'h-23 rounded-tile' : undefined}
+        className={layout === 'screen' ? 'h-18 rounded-panel' : undefined}
       >
         <RadioGroup.Item value={category.id} aria-label={category.name}>
-          <span className={layout === 'screen' ? 'text-emoji-xl' : 'text-emoji-lg'} aria-hidden>
+          <span className="text-emoji-lg" aria-hidden>
             {category.emoji}
           </span>
-          <span className={cn('max-w-full truncate font-semibold', layout === 'screen' ? 'text-sm' : 'text-xs')}>
+          <span className="max-w-full truncate text-xs font-semibold">
             {category.name}
           </span>
         </RadioGroup.Item>

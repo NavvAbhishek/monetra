@@ -1,18 +1,20 @@
 import type { SegmentedOption } from '@/components/ui/segmented-tabs'
 import { addDays, differenceInCalendarDays, startOfDay } from 'date-fns'
 import type { Expense } from '@/types/expense'
-import type { DateRange, PeriodKey } from '@/types/period'
+import type { DashboardPeriod, DateRange, PeriodKey } from '@/types/period'
 import { groupByDay, sumCents } from '@/utils/aggregate'
 import { isPastItem } from '@/utils/pastSpending'
 import { highestMonth, monthlyAverageCents } from '@/utils/spending-stats'
 import { formatMoney } from '@/utils/money'
 
-export const DASHBOARD_PERIOD_OPTIONS: readonly SegmentedOption<PeriodKey>[] = [
+/** Day … Range + All time ("All" on phones, where six tabs share one row). */
+export const getDashboardPeriodOptions = (mobile: boolean): readonly SegmentedOption<DashboardPeriod>[] => [
   { value: 'day', label: 'Day' },
   { value: 'week', label: 'Week' },
   { value: 'month', label: 'Month' },
   { value: 'year', label: 'Year' },
   { value: 'range', label: 'Range' },
+  { value: 'all', label: mobile ? 'All' : 'All time' },
 ]
 
 /** "Hi Sam 👋" — first word of the name. */

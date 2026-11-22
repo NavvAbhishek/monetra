@@ -2,6 +2,9 @@ export const PERIOD_KEYS = ['day', 'week', 'month', 'year', 'range'] as const
 
 export type PeriodKey = (typeof PERIOD_KEYS)[number]
 
+/** Dashboard tabs: the periods above + "all" = everything from the first record (tracked or past) until today. */
+export type DashboardPeriod = PeriodKey | 'all'
+
 /** Inclusive start, EXCLUSIVE end. */
 export type DateRange = { start: Date; end: Date }
 

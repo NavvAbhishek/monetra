@@ -2,11 +2,11 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { type AssistantModelId, DEFAULT_ASSISTANT_MODEL } from '@/constant/assistantModels'
 import { DEFAULT_THEME_COLOR, type ThemeColorId } from '@/constant/themeColors'
-import type { IsoDateRange, PeriodKey } from '@/types/period'
+import type { DashboardPeriod, IsoDateRange } from '@/types/period'
 
 interface UIState {
   /** Selected dashboard period tab. */
-  period: PeriodKey
+  period: DashboardPeriod
   /** Custom range for the "Range" tab (ISO strings so it survives a reload). */
   customRange: IsoDateRange | null
   /** Pre-selects the category in the Add expense form. */
@@ -17,7 +17,7 @@ interface UIState {
   sidebarCollapsed: boolean
   /** Gemini model picked on the Ask AI page (saved on this device). */
   assistantModel: AssistantModelId
-  setPeriod: (period: PeriodKey) => void
+  setPeriod: (period: DashboardPeriod) => void
   setCustomRange: (range: IsoDateRange | null) => void
   setLastCategoryId: (id: string | null) => void
   setThemeColor: (id: ThemeColorId) => void
