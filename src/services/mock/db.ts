@@ -102,5 +102,6 @@ export const cloneProfile = (u: MockUser): Profile => ({
   name: u.name,
   email: u.email,
   currency: u.currency,
+  target: u.target ? { ...u.target } : undefined,
   createdAt: new Date(u.createdAt),
 })

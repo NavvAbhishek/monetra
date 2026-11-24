@@ -4,8 +4,8 @@ import AccountSection from './components/AccountSection'
 import AppearanceSection from './components/AppearanceSection'
 import DataSection from './components/DataSection'
 import PasswordSection from './components/PasswordSection'
-import PastSpendingSection from './components/PastSpendingSection'
 import ProfileSection from './components/ProfileSection'
+import TargetSection from './components/TargetSection'
 import { useSettings } from './hooks/useSettings'
 
 /** Not in the design — built from the same components and tokens (CLAUDE.md §7.3). */
@@ -21,12 +21,12 @@ const Settings = () => {
       <div className="grid items-start gap-4.5 xl:grid-cols-2">
         <div className="flex flex-col gap-4.5">
           <ProfileSection profile={ctx.profile} isLoading={ctx.isProfileLoading} photoURL={ctx.user?.photoURL} />
-          {hasPassword ? <PasswordSection /> : <PastSpendingSection />}
+          {hasPassword ? <PasswordSection /> : <DataSection ctx={ctx} />}
         </div>
         <div className="flex flex-col gap-4.5">
           <AppearanceSection ctx={ctx} />
-          {hasPassword && <PastSpendingSection />}
-          <DataSection ctx={ctx} />
+          {!isMobile && <TargetSection ctx={ctx} />}
+          {hasPassword && <DataSection ctx={ctx} />}
         </div>
       </div>
       {/* Desktop logs out from the sidebar profile menu; phones have no sidebar, so the card stays there. */}

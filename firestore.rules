@@ -21,8 +21,18 @@ service cloud.firestore {
     }
 
     // users/{uid}
+    // `target` (optional): one spending target { period: 'week' | 'month', cents: int > 0 }
+    function validTarget(t) {
+      return t is map
+        && t.keys().hasAll(['period', 'cents']) && t.keys().hasOnly(['period', 'cents'])
+        && t.period in ['week', 'month']
+        && t.cents is int && t.cents > 0 && t.cents < 100000000000;
+    }
+
     function validProfile(d) {
-      return hasExactly(d, ['name', 'email', 'currency', 'createdAt'])
+      return d.keys().hasAll(['name', 'email', 'currency', 'createdAt'])
+        && d.keys().hasOnly(['name', 'email', 'currency', 'createdAt', 'target'])
+        && (!('target' in d) || validTarget(d.target))
         && isText(d.name, 1, 50)
         && isText(d.email, 0, 254)
         && d.currency is string && d.currency.matches('^[A-Z]{3}$')

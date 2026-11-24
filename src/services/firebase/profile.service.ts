@@ -1,5 +1,5 @@
 import { updateProfile } from 'firebase/auth'
-import { getDoc, Timestamp, updateDoc, doc, writeBatch } from 'firebase/firestore'
+import { deleteField, getDoc, Timestamp, updateDoc, doc, writeBatch } from 'firebase/firestore'
 import { DEFAULT_CATEGORIES } from '@/constant/defaultCategories'
 import { getDb, getFirebaseAuth } from '@/lib/firebase'
 import type { Profile } from '@/types/profile'
@@ -32,16 +32,19 @@ export const profileFirebase: ProfileService = {
   }),
 
   profile_update: guard(async (uid, patch) => {
-    const changes: Record<string, string> = {}
+    const changes: Record<string, unknown> = {}
     if (patch.name !== undefined) changes.name = patch.name.trim()
     if (patch.currency !== undefined) changes.currency = patch.currency
+    if (patch.target !== undefined) {
+      changes.target = patch.target === null ? deleteField() : { period: patch.target.period, cents: patch.target.cents }
+    }
     const snap = await getDoc(profileRef(uid))
     if (!snap.exists()) throw new ServiceError('profile/not-found', 'Profile not found.')
     await updateDoc(profileRef(uid), changes)
 
     const user = getFirebaseAuth().currentUser
-    if (changes.name && user?.uid === uid) {
-      await updateProfile(user, { displayName: changes.name })
+    if (patch.name?.trim() && user?.uid === uid) {
+      await updateProfile(user, { displayName: patch.name.trim() })
       notifyAuthUserChanged()
     }
     return profileFromDoc(await getDoc(profileRef(uid)))

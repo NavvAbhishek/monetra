@@ -2,7 +2,7 @@ import { type DocumentData, type DocumentSnapshot, Timestamp } from 'firebase/fi
 import type { Category } from '@/types/category'
 import type { Expense } from '@/types/expense'
 import type { PastPeriodType, PastRecord } from '@/types/pastRecord'
-import type { Profile } from '@/types/profile'
+import type { Profile, SpendTarget } from '@/types/profile'
 
 /** Firestore ↔ app types. `Timestamp` never leaves `services/firebase/` (CLAUDE.md §9). */
 
@@ -14,6 +14,14 @@ export const toTimestamp = (date: Date): Timestamp => Timestamp.fromDate(date)
 const str = (value: unknown, fallback = ''): string => (typeof value === 'string' ? value : fallback)
 const num = (value: unknown, fallback = 0): number => (typeof value === 'number' ? value : fallback)
 
+const targetFromData = (value: unknown): SpendTarget | undefined => {
+  if (typeof value !== 'object' || value === null) return undefined
+  const t = value as Record<string, unknown>
+  return (t.period === 'week' || t.period === 'month') && typeof t.cents === 'number' && t.cents > 0
+    ? { period: t.period, cents: t.cents }
+    : undefined
+}
+
 export const profileFromDoc = (snap: DocumentSnapshot<DocumentData>): Profile => {
   const d = snap.data() ?? {}
   return {
@@ -21,6 +29,7 @@ export const profileFromDoc = (snap: DocumentSnapshot<DocumentData>): Profile =>
     name: str(d.name),
     email: str(d.email),
     currency: str(d.currency, 'USD'),
+    target: targetFromData(d.target),
     createdAt: toDate(d.createdAt),
   }
 }

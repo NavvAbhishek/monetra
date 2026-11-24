@@ -24,6 +24,7 @@ export const APP_ROUTES: AppRouteMeta[] = [
   { path: '/categories', label: 'Categories' },
   { path: '/categories/new', label: 'New category', parent: '/categories', fullScreenOnMobile: true },
   { path: '/categories/$categoryId', label: 'Edit category', parent: '/categories', fullScreenOnMobile: true },
+  { path: '/more', label: 'More' },
   { path: '/insights', label: 'Insights' },
   { path: '/assistant', label: 'Ask AI' },
   { path: '/settings', label: 'Settings' },

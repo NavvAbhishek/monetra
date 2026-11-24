@@ -34,6 +34,7 @@ export {
   SendHorizontal,
   Settings,
   Sparkles,
+  Target,
   Trash2,
   TriangleAlert,
   Upload,

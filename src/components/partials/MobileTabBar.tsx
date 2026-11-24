@@ -1,32 +1,36 @@
 import type { ComponentType, SVGProps } from 'react'
 import * as Icon from '@/components/icons'
 import { IconButton } from '@/components/ui/icon-button'
-import { NAV_LINKS, SETTINGS_LINK } from '@/constant/navLinksData'
+import { MORE_LINK, MORE_TAB_PATHS, NAV_LINKS, SETTINGS_LINK } from '@/constant/navLinksData'
 import { cn } from '@/lib/utils'
-import { Link } from '@/router/navigation'
+import { Link, useLocation } from '@/router/navigation'
 
 type TabProps = {
-  to: (typeof NAV_LINKS)[number]['to'] | '/settings'
+  to: (typeof NAV_LINKS)[number]['to'] | '/settings' | '/more'
+  /** Force the highlighted state (More stays active on Categories, Insights, …). */
+  active?: boolean
   label: string
   icon: ComponentType<SVGProps<SVGSVGElement>>
 }
 
-const Tab = ({ to, label, icon: TabIcon }: TabProps) => (
+const Tab = ({ to, label, icon: TabIcon, active }: TabProps) => (
   <Link
     to={to}
     aria-label={label}
     activeOptions={{ exact: to === '/' }}
     className="grid size-11 place-items-center rounded-icon outline-none focus-visible:ring-2 focus-visible:ring-ring"
     activeProps={{ className: 'text-primary' }}
-    inactiveProps={{ className: 'text-muted-foreground' }} // muted-2 is below 3:1 for icons
+    inactiveProps={{ className: active ? 'text-primary' : 'text-muted-foreground' }} // muted-2 is below 3:1 for icons
   >
     <TabIcon className="size-6" aria-hidden />
   </Link>
 )
 
-/** Mobile bottom bar: 4 tabs + raised "+" button in the middle (M1, M2, M4). */
+/** Mobile bottom bar: Dashboard, Expenses, raised "+", More (hub), Settings. */
 const MobileTabBar = ({ className }: { className?: string }) => {
-  const [dashboard, expenses, categories] = NAV_LINKS
+  const [dashboard, expenses] = NAV_LINKS
+  const { pathname } = useLocation()
+  const moreActive = MORE_TAB_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))
   return (
     <nav
       aria-label="Tab bar"
@@ -42,7 +46,7 @@ const MobileTabBar = ({ className }: { className?: string }) => {
           <Icon.Plus aria-hidden />
         </Link>
       </IconButton>
-      <Tab {...categories} />
+      <Tab {...MORE_LINK} active={moreActive} />
       <Tab {...SETTINGS_LINK} />
     </nav>
   )

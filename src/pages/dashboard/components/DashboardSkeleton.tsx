@@ -17,7 +17,7 @@ const DashboardSkeleton = ({ compact }: { compact: boolean }) =>
       <Skeleton className="h-85 rounded-card" />
       <Skeleton className="h-85 rounded-card" />
       <Skeleton className="h-60 rounded-card" />
-      <Skeleton className="h-72 rounded-card" />
+      <Skeleton className="h-96 rounded-card" />
     </div>
   )
 

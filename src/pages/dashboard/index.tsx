@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { IconButton } from '@/components/ui/icon-button'
 import { PageHeader } from '@/components/ui/page-header'
-import AskAssistantCard from './components/AskAssistantCard'
 import CategoryBreakdown from './components/CategoryBreakdown'
 import DashboardPeriodTabs from './components/DashboardPeriodTabs'
 import DashboardSkeleton from './components/DashboardSkeleton'
@@ -12,6 +11,7 @@ import RangePicker from './components/RangePicker'
 import Insights from './components/Insights'
 import SpendingBreakdown from './components/SpendingBreakdown'
 import SpentCard from './components/SpentCard'
+import TargetCard from './components/TargetCard'
 import { useDashboard } from './hooks/useDashboard'
 
 /** Dashboard — M1 (mobile) · D1 (desktop), with the date range picker (M6 / D1 popover). */
@@ -43,16 +43,17 @@ const Dashboard = () => {
     <>
       <SpentCard ctx={ctx} />
       <CategoryBreakdown ctx={ctx} />
+      <TargetCard ctx={ctx} />
       <Insights ctx={ctx} />
-      <AskAssistantCard />
       <AllTimeCard />
     </>
   ) : (
     <>
       <SpentCard ctx={ctx} className="min-h-85" />
       <CategoryBreakdown ctx={ctx} />
+      <TargetCard ctx={ctx} />
+      <SpendingBreakdown ctx={ctx} className="min-h-96" />
       <Insights ctx={ctx} />
-      <SpendingBreakdown ctx={ctx} className="min-h-72" />
       <AllTimeCard />
     </>
   )

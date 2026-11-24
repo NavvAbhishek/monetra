@@ -154,6 +154,9 @@ export const useDashboard = () => {
 
   return {
     isMobile,
+    now,
+    range,
+    target: profileQuery.data?.target,
     firstName: getFirstName(user?.name),
     currency,
     // period

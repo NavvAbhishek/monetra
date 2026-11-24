@@ -28,6 +28,7 @@ export const profileMock: ProfileService = {
     if (!user) throw new ServiceError('profile/not-found', 'Profile not found.')
     if (patch.name !== undefined) user.name = patch.name.trim()
     if (patch.currency !== undefined) user.currency = patch.currency
+    if (patch.target !== undefined) user.target = patch.target ?? undefined
     saveDb()
     notifyAuthChange() // the user's name may have changed
     return cloneProfile(user)
